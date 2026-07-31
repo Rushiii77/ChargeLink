@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1088966281100",
+    "project_id": "chargelink-rushi-2026-10d33",
+    "storage_bucket": "chargelink-rushi-2026-10d33.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1088966281100:android:725977160206151a3ab8a9",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM7Dq3e8mDRZQn-nZIKMLJof7GuWqD1o4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
