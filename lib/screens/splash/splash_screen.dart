@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,9 +10,9 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-
   late AnimationController _controller;
   late Animation<double> _animation;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -26,18 +25,20 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutCubic,
     );
 
     _controller.forward();
 
-    Timer(const Duration(seconds: 3), () {
+    _timer = Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/login');
     });
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -47,54 +48,97 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       body: Container(
         width: double.infinity,
-        color: Colors.white,
-        child: FadeTransition(
-          opacity: _animation,
-          child: ScaleTransition(
-            scale: _animation,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF00C853), Color(0xFF1A6B3A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: FadeTransition(
+            opacity: _animation,
+            child: ScaleTransition(
+              scale: _animation,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(flex: 2),
 
-                const Icon(
-                  Icons.ev_station,
-                  size: 100,
-                  color: Colors.green,
-                ),
-
-                const SizedBox(height: 25),
-
-                const Text(
-                  "ChargeLink",
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
+                  // Logo Icon in White Circle
+                  Container(
+                    width: 110,
+                    height: 110,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.ev_station_rounded,
+                      size: 60,
+                      color: Color(0xFF00C853),
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 10),
+                  const SizedBox(height: 28),
 
-                Text(
-                  "Powering Peer-to-Peer EV Charging",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey.shade600,
+                  const Text(
+                    "ChargeLink",
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 80),
+                  const SizedBox(height: 8),
 
-                const CircularProgressIndicator(),
+                  Text(
+                    "Smart EV Charging Platform",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
 
-                const SizedBox(height: 15),
+                  const Spacer(flex: 2),
 
-                const Text(
-                  "Loading...",
-                  style: TextStyle(fontSize: 15),
-                )
-              ],
+                  // Loading Spinner
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Text(
+                    "Connecting to nearby chargers...",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+
+                  const Spacer(flex: 1),
+                ],
+              ),
             ),
           ),
         ),

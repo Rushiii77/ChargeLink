@@ -47,5 +47,28 @@ class AuthService {
     await _auth.signOut();
   }
 
+  Future<void> resetPassword({required String email}) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<String?> getUserRole(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists && doc.data() != null) {
+        return doc.data()!['role'] as String?;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  Future<void> updateUserRole({
+    required String uid,
+    required String role,
+  }) async {
+    await _firestore.collection('users').doc(uid).update({
+      'role': role,
+    });
+  }
+
   User? get currentUser => _auth.currentUser;
 }
