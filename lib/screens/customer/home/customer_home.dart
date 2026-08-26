@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../../../core/theme/map_styles.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
@@ -49,15 +50,21 @@ class _CustomerHomeState extends State<CustomerHome> {
   @override
   void initState() {
     super.initState();
+    ThemeService.themeModeNotifier.addListener(_updateMapTheme);
     _loadCustomMarker();
     _initChargers();
   }
 
   @override
   void dispose() {
+    ThemeService.themeModeNotifier.removeListener(_updateMapTheme);
     _chargerSubscription?.cancel();
     _mapController?.dispose();
     super.dispose();
+  }
+
+  void _updateMapTheme() {
+    if (mounted) setState(() {});
   }
 
   // ── Custom Marker ─────────────────────────────────────────────────────────
@@ -253,6 +260,7 @@ class _CustomerHomeState extends State<CustomerHome> {
           GoogleMap(
             initialCameraPosition: _initialPosition,
             markers: _buildMarkers(),
+            style: ThemeService.isDark(context) ? MapStyles.darkMapStyle : null,
             onMapCreated: (controller) {
               _mapController = controller;
               _goToMyLocation();
