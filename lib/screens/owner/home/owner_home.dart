@@ -4,6 +4,7 @@ import '../../../models/booking_model.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_container.dart';
 import '../add_charger/add_charger_screen.dart';
@@ -154,19 +155,41 @@ class _OwnerHomeState extends State<OwnerHome> {
                               ],
                             ),
 
-                            // Logout Button
-                            GlassContainer(
-                              width: 44,
-                              height: 44,
-                              borderRadius: BorderRadius.circular(14),
-                              blur: 16,
-                              opacity: 0.1,
-                              onTap: _logout,
-                              child: const Icon(
-                                Icons.logout_rounded,
-                                color: Colors.white70,
-                                size: 18,
-                              ),
+                            // Actions: Theme toggle + Logout
+                            Row(
+                              children: [
+                                GlassContainer(
+                                  width: 44,
+                                  height: 44,
+                                  borderRadius: BorderRadius.circular(14),
+                                  blur: 16,
+                                  opacity: 0.1,
+                                  onTap: () => ThemeService.toggleTheme(),
+                                  child: Icon(
+                                    ThemeService.isDark(context)
+                                        ? Icons.wb_sunny_rounded
+                                        : Icons.nightlight_round,
+                                    color: ThemeService.isDark(context)
+                                        ? const Color(0xFFFFB300)
+                                        : const Color(0xFF00E5FF),
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                GlassContainer(
+                                  width: 44,
+                                  height: 44,
+                                  borderRadius: BorderRadius.circular(14),
+                                  blur: 16,
+                                  opacity: 0.1,
+                                  onTap: _logout,
+                                  child: const Icon(
+                                    Icons.logout_rounded,
+                                    color: Colors.white70,
+                                    size: 18,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

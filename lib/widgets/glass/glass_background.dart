@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/theme_service.dart';
 
 class GlassBackground extends StatelessWidget {
   final Widget child;
@@ -13,19 +14,26 @@ class GlassBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isDark = ThemeService.isDark(context);
 
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF0B132B), // Deep Cosmic Midnight
-            Color(0xFF1C2541), // Deep Slate Indigo
-            Color(0xFF0B1E1A), // Dark Emerald Ambient
-          ],
+          colors: isDark
+              ? const [
+                  Color(0xFF0B132B), // Deep Cosmic Midnight
+                  Color(0xFF1C2541), // Deep Slate Indigo
+                  Color(0xFF0B1E1A), // Dark Emerald Ambient
+                ]
+              : const [
+                  Color(0xFFF8FAFC), // Icy Sky White
+                  Color(0xFFE2E8F0), // Soft Frosted Slate
+                  Color(0xFFE0F2FE), // Soft Cyan Ambient
+                ],
         ),
       ),
       child: Stack(
@@ -42,7 +50,7 @@ class GlassBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(0xFF00E676).withValues(alpha: 0.35),
+                      const Color(0xFF00E676).withValues(alpha: isDark ? 0.35 : 0.2),
                       const Color(0xFF00E676).withValues(alpha: 0.0),
                     ],
                   ),
@@ -61,7 +69,7 @@ class GlassBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(0xFF00E5FF).withValues(alpha: 0.25),
+                      const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.25 : 0.18),
                       const Color(0xFF00E5FF).withValues(alpha: 0.0),
                     ],
                   ),
@@ -80,8 +88,8 @@ class GlassBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(0xFF7C3AED).withValues(alpha: 0.25),
-                      const Color(0xFF7C3AED).withValues(alpha: 0.0),
+                      const Color(0xFF8B5CF6).withValues(alpha: isDark ? 0.25 : 0.15),
+                      const Color(0xFF8B5CF6).withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -96,4 +104,3 @@ class GlassBackground extends StatelessWidget {
     );
   }
 }
-

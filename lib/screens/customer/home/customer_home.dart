@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/cards/charger_card.dart';
 import '../../../widgets/common/filter_sheet.dart';
 import '../../../widgets/glass/glass_container.dart';
@@ -345,9 +346,31 @@ class _CustomerHomeState extends State<CustomerHome> {
 
                   const SizedBox(width: 8),
 
+                  // Glass Theme Toggle button
+                  GlassContainer(
+                    width: 48,
+                    height: 52,
+                    borderRadius: BorderRadius.circular(18),
+                    blur: 20,
+                    opacity: 0.35,
+                    color: const Color(0xFF0B132B),
+                    onTap: () => ThemeService.toggleTheme(),
+                    child: Icon(
+                      ThemeService.isDark(context)
+                          ? Icons.wb_sunny_rounded
+                          : Icons.nightlight_round,
+                      color: ThemeService.isDark(context)
+                          ? const Color(0xFFFFB300)
+                          : const Color(0xFF00E5FF),
+                      size: 20,
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
                   // Glass Logout button
                   GlassContainer(
-                    width: 50,
+                    width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
                     blur: 20,

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../services/theme_service.dart';
 
 class GlassContainer extends StatelessWidget {
   final Widget child;
@@ -9,7 +10,7 @@ class GlassContainer extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final BorderRadius? borderRadius;
   final double blur;
-  final double opacity;
+  final double? opacity;
   final Color? color;
   final Color? borderColor;
   final double borderWidth;
@@ -26,7 +27,7 @@ class GlassContainer extends StatelessWidget {
     this.margin,
     this.borderRadius,
     this.blur = 16.0,
-    this.opacity = 0.12,
+    this.opacity,
     this.color,
     this.borderColor,
     this.borderWidth = 1.2,
@@ -38,7 +39,14 @@ class GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveRadius = borderRadius ?? BorderRadius.circular(20);
-    final effectiveColor = color ?? Colors.white;
+    final isDark = ThemeService.isDark(context);
+
+    final effectiveColor = color ?? (isDark ? Colors.white : Colors.white);
+    final effectiveOpacity = opacity ?? (isDark ? 0.12 : 0.75);
+    final effectiveBorderColor = borderColor ??
+        (isDark
+            ? Colors.white.withValues(alpha: 0.22)
+            : Colors.white.withValues(alpha: 0.8));
 
     Widget content = Container(
       width: width,
@@ -49,16 +57,18 @@ class GlassContainer extends StatelessWidget {
         boxShadow: [
           if (glowColor != null)
             BoxShadow(
-              color: glowColor!.withValues(alpha: 0.25),
+              color: glowColor!.withValues(alpha: isDark ? 0.25 : 0.2),
               blurRadius: 20 + glowSpread,
               spreadRadius: glowSpread,
               offset: const Offset(0, 4),
             )
           else
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.18)
+                  : const Color(0xFF64748B).withValues(alpha: 0.08),
               blurRadius: 16,
-              offset: const Offset(0, 8),
+              offset: const Offset(0, 6),
             ),
         ],
       ),
@@ -74,12 +84,14 @@ class GlassContainer extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  effectiveColor.withValues(alpha: opacity + 0.08),
-                  effectiveColor.withValues(alpha: opacity),
+                  effectiveColor.withValues(
+                      alpha: (effectiveOpacity + 0.08).clamp(0.0, 1.0)),
+                  effectiveColor.withValues(
+                      alpha: effectiveOpacity.clamp(0.0, 1.0)),
                 ],
               ),
               border: Border.all(
-                color: borderColor ?? Colors.white.withValues(alpha: 0.25),
+                color: effectiveBorderColor,
                 width: borderWidth,
               ),
             ),
@@ -99,4 +111,3 @@ class GlassContainer extends StatelessWidget {
     return content;
   }
 }
-
