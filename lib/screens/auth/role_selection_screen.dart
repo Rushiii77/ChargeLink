@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/glass/glass_background.dart';
+import '../../widgets/glass/glass_button.dart';
+import '../../widgets/glass/glass_container.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -16,9 +19,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   Future<void> _handleContinue() async {
     if (selectedRole == null) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final currentUser = _authService.currentUser;
@@ -41,135 +42,109 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Failed to save role. Please try again.'),
-            backgroundColor: Colors.red.shade400,
+            backgroundColor: Colors.redAccent.shade700,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
+      body: GlassBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
 
-              // Step Indicator Pill
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8FFF0),
+                // Step Pill
+                GlassContainer(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   borderRadius: BorderRadius.circular(20),
+                  blur: 16,
+                  opacity: 0.15,
+                  child: const Text(
+                    "STEP 2 OF 2",
+                    style: TextStyle(
+                      color: Color(0xFF00E676),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
                 ),
-                child: const Text(
-                  "STEP 2 OF 2",
+
+                const SizedBox(height: 18),
+
+                const Text(
+                  "Choose Your Role",
                   style: TextStyle(
-                    color: Color(0xFF00C853),
-                    fontSize: 12,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 18),
+                const SizedBox(height: 6),
 
-              const Text(
-                "Choose Your Role",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              const Text(
-                "Select how you plan to use ChargeLink. You can also explore other features later.",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
-                  height: 1.4,
-                ),
-              ),
-
-              const SizedBox(height: 36),
-
-              // Role Card 1: EV Owner / Driver
-              _buildRoleOption(
-                title: "EV Owner & Driver",
-                subtitle: "Discover nearby chargers, check live availability, and book slots seamlessly.",
-                icon: Icons.electric_car_rounded,
-                value: "customer",
-                badgeText: "Recommended for drivers",
-              ),
-
-              const SizedBox(height: 20),
-
-              // Role Card 2: Charger Owner / Host
-              _buildRoleOption(
-                title: "Charging Station Host",
-                subtitle: "List your private or commercial charger, manage bookings, and earn passive income.",
-                icon: Icons.ev_station_rounded,
-                value: "owner",
-                badgeText: "For station owners",
-              ),
-
-              const Spacer(),
-
-              // Continue Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedRole == null
-                      ? Colors.grey.shade400
-                      : const Color(0xFF00C853),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
+                Text(
+                  "Select how you plan to use ChargeLink. You can switch or add roles anytime in settings.",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withValues(alpha: 0.7),
+                    height: 1.4,
                   ),
-                  elevation: selectedRole == null ? 0 : 2,
-                  shadowColor: const Color(0xFF00C853).withValues(alpha: 0.4),
                 ),
-                onPressed: (selectedRole == null || _isLoading)
-                    ? null
-                    : _handleContinue,
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : const Text(
-                        "GET STARTED",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-              ),
 
-              const SizedBox(height: 12),
-            ],
+                const SizedBox(height: 36),
+
+                // Role Option 1: EV Driver
+                _buildRoleOption(
+                  title: "EV Owner & Driver",
+                  badge: "Recommended for Drivers",
+                  description:
+                      "Discover high-speed chargers, check live availability, AI match, and reserve slots seamlessly.",
+                  icon: Icons.electric_car_rounded,
+                  value: "customer",
+                  accentColor: const Color(0xFF00E676),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Role Option 2: Station Host
+                _buildRoleOption(
+                  title: "Charging Station Host",
+                  badge: "Monetize Your Charger",
+                  description:
+                      "List your private or commercial charger, manage bookings, verify driver PINs, and earn revenue.",
+                  icon: Icons.ev_station_rounded,
+                  value: "owner",
+                  accentColor: const Color(0xFF00E5FF),
+                ),
+
+                const Spacer(),
+
+                // Continue Button
+                GlassButton(
+                  text: "CONTINUE",
+                  isLoading: _isLoading,
+                  icon: Icons.arrow_forward_rounded,
+                  color: selectedRole != null ? const Color(0xFF00E676) : null,
+                  onPressed: selectedRole == null ? null : _handleContinue,
+                ),
+
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),
@@ -178,131 +153,109 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
   Widget _buildRoleOption({
     required String title,
-    required String subtitle,
+    required String badge,
+    required String description,
     required IconData icon,
     required String value,
-    required String badgeText,
+    required Color accentColor,
   }) {
     final bool isSelected = selectedRole == value;
 
-    return InkWell(
-      onTap: () {
-        setState(() {
-          selectedRole = value;
-        });
-      },
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8FFF0) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF00C853) : const Color(0xFFE5E7EB),
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected
-                  ? const Color(0xFF00C853).withValues(alpha: 0.12)
-                  : Colors.black.withValues(alpha: 0.04),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // Icon Box
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
+    return GlassContainer(
+      padding: const EdgeInsets.all(20),
+      borderRadius: BorderRadius.circular(24),
+      blur: 20,
+      opacity: isSelected ? 0.22 : 0.08,
+      borderColor: isSelected ? accentColor : Colors.white.withValues(alpha: 0.15),
+      borderWidth: isSelected ? 2.0 : 1.0,
+      glowColor: isSelected ? accentColor : null,
+      glowSpread: isSelected ? 2 : 0,
+      onTap: () => setState(() => selectedRole = value),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              // Icon Box
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? accentColor.withValues(alpha: 0.25)
+                      : Colors.white.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF00C853)
-                        : const Color(0xFFF5F7FA),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 28,
-                    color: isSelected ? Colors.white : const Color(0xFF1A1A2E),
+                        ? accentColor
+                        : Colors.white.withValues(alpha: 0.2),
                   ),
                 ),
-
-                const SizedBox(width: 16),
-
-                // Title + Subtitle Header
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected
-                              ? const Color(0xFF00C853)
-                              : const Color(0xFF1A1A2E),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        badgeText,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: isSelected
-                              ? const Color(0xFF1A6B3A)
-                              : const Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Icon(
+                  icon,
+                  size: 28,
+                  color: isSelected ? accentColor : Colors.white70,
                 ),
-
-                // Check Circle
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isSelected ? const Color(0xFF00C853) : Colors.transparent,
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF00C853)
-                          : const Color(0xFFD1D5DB),
-                      width: 2,
-                    ),
-                  ),
-                  child: isSelected
-                      ? const Icon(
-                          Icons.check,
-                          size: 16,
-                          color: Colors.white,
-                        )
-                      : null,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            Text(
-              subtitle,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFF6B7280),
-                height: 1.4,
               ),
+
+              const SizedBox(width: 16),
+
+              // Title + Badge
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      badge,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isSelected ? accentColor : Colors.white54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Check Indicator
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSelected ? accentColor : Colors.transparent,
+                  border: Border.all(
+                    color: isSelected ? accentColor : Colors.white30,
+                    width: 2,
+                  ),
+                ),
+                child: isSelected
+                    ? const Icon(Icons.check, size: 16, color: Color(0xFF0B132B))
+                    : null,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.7),
+              height: 1.4,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

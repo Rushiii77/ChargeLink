@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,7 +8,11 @@ import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
 import '../../../widgets/cards/charger_card.dart';
 import '../../../widgets/common/filter_sheet.dart';
+import '../../../widgets/glass/glass_container.dart';
+import '../ai/smart_recommendation_sheet.dart';
 import '../charger/charger_detail_sheet.dart';
+import '../session/active_session_screen.dart';
+import '../trip/trip_planner_screen.dart';
 
 class CustomerHome extends StatefulWidget {
   const CustomerHome({super.key});
@@ -28,8 +31,8 @@ class _CustomerHomeState extends State<CustomerHome> {
   BitmapDescriptor? _customMarker;
 
   static const CameraPosition _initialPosition = CameraPosition(
-    target: LatLng(19.0330, 73.0297),
-    zoom: 14,
+    target: LatLng(19.0330, 73.0297), // Nerul, Navi Mumbai
+    zoom: 13.5,
   );
 
   // ── State ─────────────────────────────────────────────────────────────────
@@ -39,105 +42,119 @@ class _CustomerHomeState extends State<CustomerHome> {
   String _searchQuery = '';
   bool _isLoading = true;
 
-  late StreamSubscription<List<ChargerModel>> _chargerSub;
-  final TextEditingController _searchController = TextEditingController();
+  StreamSubscription<List<ChargerModel>>? _chargerSubscription;
 
-  // ── Init ──────────────────────────────────────────────────────────────────
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
     _loadCustomMarker();
-    _ensureChargersSeeded();
-    _listenToChargers();
+    _initChargers();
   }
 
   @override
   void dispose() {
+    _chargerSubscription?.cancel();
     _mapController?.dispose();
-    _chargerSub.cancel();
-    _searchController.dispose();
     super.dispose();
   }
 
-  // ── Marker icon ───────────────────────────────────────────────────────────
+  // ── Custom Marker ─────────────────────────────────────────────────────────
   Future<void> _loadCustomMarker() async {
     try {
       final marker = await BitmapDescriptor.asset(
-        const ImageConfiguration(size: Size(48, 48)),
+        const ImageConfiguration(size: Size(44, 44)),
         'assets/icons/ev_marker.png',
       );
-      if (mounted) setState(() => _customMarker = marker);
-    } catch (_) {}
+      if (mounted) {
+        setState(() {
+          _customMarker = marker;
+        });
+      }
+    } catch (_) {
+      // Fall back to default marker
+    }
   }
 
-  // ── Seed Firestore if empty ───────────────────────────────────────────────
-  Future<void> _ensureChargersSeeded() async {
+  // ── Chargers Stream + Seed ────────────────────────────────────────────────
+  Future<void> _initChargers() async {
     final exists = await _chargerService.chargersExist();
     if (!exists) {
       await _chargerService.seedChargers();
     }
+
+    _chargerSubscription = _chargerService.chargerStream().listen(
+      (chargers) {
+        if (!mounted) return;
+        setState(() {
+          _allChargers = chargers;
+          _applyFilters();
+          _isLoading = false;
+        });
+      },
+      onError: (_) {
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+      },
+    );
   }
 
-  // ── Real-time charger stream ──────────────────────────────────────────────
-  void _listenToChargers() {
-    _chargerSub = _chargerService.chargerStream().listen((chargers) {
-      if (!mounted) return;
-      setState(() {
-        _allChargers = chargers;
-        _isLoading = false;
-        _applyFilters();
-      });
-    });
-  }
-
-  // ── Filter + Search ───────────────────────────────────────────────────────
+  // ── Filtering ─────────────────────────────────────────────────────────────
   void _applyFilters() {
-    final query = _searchQuery.toLowerCase();
-    setState(() {
-      _filteredChargers = _allChargers.where((c) {
-        // Search
-        if (query.isNotEmpty &&
-            !c.name.toLowerCase().contains(query) &&
-            !c.address.toLowerCase().contains(query)) {
-          return false;
-        }
-        // Charger type
-        if (_filter.chargerType != 'All' &&
-            c.chargerType != _filter.chargerType) {
-          return false;
-        }
-        // Connector
-        if (_filter.connectorType != 'All' &&
-            c.connectorType != _filter.connectorType) {
-          return false;
-        }
-        // Min power
-        if (_filter.minPowerKw > 0 && c.powerKw < _filter.minPowerKw) {
-          return false;
-        }
-        // Availability
-        if (_filter.availableOnly && !c.isAvailable) {
-          return false;
-        }
-        return true;
-      }).toList();
-    });
+    _filteredChargers = _allChargers.where((charger) {
+      if (_filter.availableOnly && !charger.isAvailable) return false;
+
+      if (_filter.chargerType != 'All' &&
+          charger.chargerType.toUpperCase() !=
+              _filter.chargerType.toUpperCase()) {
+        return false;
+      }
+
+      if (_filter.connectorType != 'All' &&
+          !charger.connectorType
+              .toUpperCase()
+              .contains(_filter.connectorType.toUpperCase())) {
+        return false;
+      }
+
+      if (_filter.minPowerKw > 0 && charger.powerKw < _filter.minPowerKw) {
+        return false;
+      }
+
+      if (_searchQuery.isNotEmpty) {
+        final query = _searchQuery.toLowerCase();
+        final nameMatch = charger.name.toLowerCase().contains(query);
+        final addressMatch = charger.address.toLowerCase().contains(query);
+        if (!nameMatch && !addressMatch) return false;
+      }
+
+      return true;
+    }).toList();
   }
 
-  // ── Map markers ───────────────────────────────────────────────────────────
+  // ── Markers ───────────────────────────────────────────────────────────────
   Set<Marker> _buildMarkers() {
-    final icon = _customMarker ?? BitmapDescriptor.defaultMarker;
     return _filteredChargers.map((charger) {
       return Marker(
         markerId: MarkerId(charger.id),
         position: LatLng(charger.latitude, charger.longitude),
-        icon: icon,
+        icon: _customMarker ??
+            BitmapDescriptor.defaultMarkerWithHue(
+              charger.isAvailable
+                  ? BitmapDescriptor.hueGreen
+                  : BitmapDescriptor.hueRed,
+            ),
+        infoWindow: InfoWindow(
+          title: charger.name,
+          snippet: '${charger.powerLabel} • ₹${charger.pricePerKwh.toStringAsFixed(0)}/kWh',
+          onTap: () => _showDetail(charger),
+        ),
         onTap: () => _showDetail(charger),
       );
     }).toSet();
   }
 
-  // ── Show charger detail ───────────────────────────────────────────────────
+  // ── Bottom sheet: Charger Detail ──────────────────────────────────────────
   void _showDetail(ChargerModel charger) {
     showModalBottomSheet(
       context: context,
@@ -147,19 +164,19 @@ class _CustomerHomeState extends State<CustomerHome> {
     );
   }
 
-  // ── Filter bottom sheet ───────────────────────────────────────────────────
+  // ── Bottom sheet: Filter ──────────────────────────────────────────────────
   void _openFilterSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (_) => FilterSheet(
         initialFilter: _filter,
-        onApply: (f) {
-          setState(() => _filter = f);
-          _applyFilters();
+        onApply: (newFilter) {
+          setState(() {
+            _filter = newFilter;
+            _applyFilters();
+          });
         },
       ),
     );
@@ -211,7 +228,7 @@ class _CustomerHomeState extends State<CustomerHome> {
         ),
       );
     } catch (_) {
-      // If GPS fails or times out, smoothly focus on chargers cluster (Nerul)
+      // Fallback
       _mapController?.animateCamera(
         CameraUpdate.newCameraPosition(_initialPosition),
       );
@@ -237,7 +254,6 @@ class _CustomerHomeState extends State<CustomerHome> {
             markers: _buildMarkers(),
             onMapCreated: (controller) {
               _mapController = controller;
-              // Auto-center on user's real GPS after map loads
               _goToMyLocation();
             },
             zoomControlsEnabled: false,
@@ -245,136 +261,103 @@ class _CustomerHomeState extends State<CustomerHome> {
             myLocationEnabled: true,
           ),
 
-          // ── Top overlay: search bar + filter ───────────────────────────
+          // ── Top Glass Overlay: Search & Actions ─────────────────────────
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
-                  // Search bar
+                  // Glass Search Bar
                   Expanded(
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
+                    child: GlassContainer(
+                      height: 52,
+                      borderRadius: BorderRadius.circular(18),
+                      blur: 20,
+                      opacity: 0.35,
+                      color: const Color(0xFF0B132B),
                       child: TextField(
-                        controller: _searchController,
-                        onChanged: (v) {
-                          _searchQuery = v;
-                          _applyFilters();
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                            _applyFilters();
+                          });
                         },
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        cursorColor: const Color(0xFF00E676),
                         decoration: InputDecoration(
-                          hintText: 'Search charging stations...',
+                          hintText: 'Search EV charging stations...',
                           hintStyle: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 14,
+                            color: Colors.white.withValues(alpha: 0.5),
+                            fontSize: 13,
                           ),
                           prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.green,
+                            Icons.search_rounded,
+                            color: Color(0xFF00E676),
+                            size: 20,
                           ),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.close, size: 18),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    _searchQuery = '';
-                                    _applyFilters();
-                                  },
-                                )
-                              : null,
                           border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 14),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 14,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
 
-                  // Filter button
-                  GestureDetector(
+                  const SizedBox(width: 8),
+
+                  // Glass Filter button
+                  GlassContainer(
+                    width: 50,
+                    height: 52,
+                    borderRadius: BorderRadius.circular(18),
+                    blur: 20,
+                    opacity: _filter.isActive ? 0.45 : 0.35,
+                    color: _filter.isActive ? const Color(0xFF00E676) : const Color(0xFF0B132B),
+                    borderColor: _filter.isActive ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.25),
+                    glowColor: _filter.isActive ? const Color(0xFF00E676) : null,
                     onTap: _openFilterSheet,
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color:
-                            _filter.isActive ? Colors.green : Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.tune,
-                        color:
-                            _filter.isActive ? Colors.white : Colors.black87,
-                      ),
+                    child: Icon(
+                      Icons.tune_rounded,
+                      color: _filter.isActive ? const Color(0xFF0B132B) : Colors.white,
+                      size: 20,
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
 
-                  // My Bookings button
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/my-bookings');
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.calendar_month_rounded,
-                        color: Color(0xFF00C853),
-                      ),
+                  // Glass My Bookings button
+                  GlassContainer(
+                    width: 50,
+                    height: 52,
+                    borderRadius: BorderRadius.circular(18),
+                    blur: 20,
+                    opacity: 0.35,
+                    color: const Color(0xFF0B132B),
+                    onTap: () => Navigator.pushNamed(context, '/my-bookings'),
+                    child: const Icon(
+                      Icons.calendar_month_rounded,
+                      color: Color(0xFF00E676),
+                      size: 20,
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
 
-                  // Logout button
-                  GestureDetector(
+                  // Glass Logout button
+                  GlassContainer(
+                    width: 50,
+                    height: 52,
+                    borderRadius: BorderRadius.circular(18),
+                    blur: 20,
+                    opacity: 0.35,
+                    color: const Color(0xFF0B132B),
                     onTap: _logout,
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.logout, color: Colors.black87),
+                    child: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.white70,
+                      size: 20,
                     ),
                   ),
                 ],
@@ -385,13 +368,13 @@ class _CustomerHomeState extends State<CustomerHome> {
           // ── Loading overlay ─────────────────────────────────────────────
           if (_isLoading)
             Container(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.4),
               child: const Center(
-                child: CircularProgressIndicator(color: Colors.green),
+                child: CircularProgressIndicator(color: Color(0xFF00E676)),
               ),
             ),
 
-          // ── Bottom charger cards strip ──────────────────────────────────
+          // ── Bottom Glass Cards & Smart Actions Strip ─────────────────────
           if (!_isLoading)
             Positioned(
               left: 0,
@@ -402,41 +385,44 @@ class _CustomerHomeState extends State<CustomerHome> {
         ],
       ),
 
-      // ── FAB: my location ────────────────────────────────────────────────
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.green,
-        mini: true,
-        onPressed: _goToMyLocation,
-        child: const Icon(Icons.my_location, color: Colors.white),
+      // ── Floating GPS Button in Crystal Glass ────────────────────────────
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 230),
+        child: GlassContainer(
+          width: 48,
+          height: 48,
+          borderRadius: BorderRadius.circular(16),
+          blur: 20,
+          opacity: 0.4,
+          color: const Color(0xFF0B132B),
+          glowColor: const Color(0xFF00E676),
+          onTap: _goToMyLocation,
+          child: const Center(
+            child: Icon(Icons.my_location_rounded, color: Color(0xFF00E676), size: 22),
+          ),
+        ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
   Widget _buildBottomStrip() {
     if (_filteredChargers.isEmpty) {
-      return Container(
+      return GlassContainer(
         margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.all(18),
+        borderRadius: BorderRadius.circular(20),
+        blur: 20,
+        opacity: 0.35,
+        color: const Color(0xFF0B132B),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, color: Colors.grey.shade400),
+            Icon(Icons.search_off_rounded, color: Colors.white.withValues(alpha: 0.5)),
             const SizedBox(width: 10),
             Text(
               'No chargers match your filters',
-              style: TextStyle(color: Colors.grey.shade500),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             ),
           ],
         ),
@@ -445,31 +431,84 @@ class _CustomerHomeState extends State<CustomerHome> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(0, 12, 0, 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.transparent,
-            Colors.black.withValues(alpha: 0.04),
-          ],
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Smart Feature Glass Pill Action Bar
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _buildSmartPill(
+                  icon: Icons.auto_awesome_rounded,
+                  label: "AI Smart Match",
+                  color: const Color(0xFF00E676),
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => SmartRecommendationSheet(
+                        allChargers: _allChargers,
+                        userLat: 19.0330,
+                        userLng: 73.0297,
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+                _buildSmartPill(
+                  icon: Icons.alt_route_rounded,
+                  label: "Trip Planner",
+                  color: const Color(0xFF00E5FF),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const TripPlannerScreen()),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+                _buildSmartPill(
+                  icon: Icons.bolt_rounded,
+                  label: "Live Session",
+                  color: const Color(0xFFFFB300),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ActiveSessionScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
           Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 8),
-            child: Text(
-              '${_filteredChargers.length} station${_filteredChargers.length == 1 ? '' : 's'} nearby',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.only(left: 18, bottom: 8),
+            child: GlassContainer(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              borderRadius: BorderRadius.circular(14),
+              blur: 16,
+              opacity: 0.35,
+              color: const Color(0xFF0B132B),
+              child: Text(
+                '${_filteredChargers.length} station${_filteredChargers.length == 1 ? '' : 's'} nearby',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
+
           SizedBox(
-            height: 175,
+            height: 180,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.fromLTRB(16, 0, 4, 8),
@@ -477,7 +516,6 @@ class _CustomerHomeState extends State<CustomerHome> {
               itemBuilder: (_, i) => ChargerCard(
                 charger: _filteredChargers[i],
                 onTap: () {
-                  // Animate map to charger
                   _mapController?.animateCamera(
                     CameraUpdate.newCameraPosition(
                       CameraPosition(
@@ -492,6 +530,38 @@ class _CustomerHomeState extends State<CustomerHome> {
                   _showDetail(_filteredChargers[i]);
                 },
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSmartPill({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GlassContainer(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      borderRadius: BorderRadius.circular(20),
+      blur: 20,
+      opacity: 0.35,
+      color: const Color(0xFF0B132B),
+      borderColor: color.withValues(alpha: 0.4),
+      onTap: onTap,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
         ],

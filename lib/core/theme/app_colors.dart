@@ -3,26 +3,29 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  static const Color primary = Color(0xFF00C853);
-  static const Color primaryDark = Color(0xFF1A6B3A);
+  // ── Neon Crystal Accents ──────────────────────────────────────────────────
+  static const Color primary = Color(0xFF00E676); // Neon Emerald
+  static const Color primaryDark = Color(0xFF00B248);
   static const Color primaryLight = Color(0xFFE8FFF0);
 
-  static const Color secondary = Color(0xFF3B82F6);
-  static const Color accent = Color(0xFFF59E0B);
-  static const Color purple = Color(0xFF7C3AED);
-  static const Color teal = Color(0xFF0D9488);
+  static const Color cyan = Color(0xFF00E5FF); // Electric Cyan
+  static const Color purple = Color(0xFF8B5CF6); // Neon Violet
+  static const Color amber = Color(0xFFFFB300); // Electric Amber
+  static const Color rose = Color(0xFFF43F5E); // Neon Rose
 
-  static const Color background = Color(0xFFF5F7FA);
-  static const Color cardWhite = Colors.white;
+  // ── Cosmic Glass Surfaces ─────────────────────────────────────────────────
+  static const Color glassDarkBg = Color(0xFF0B132B);
+  static const Color glassSurface = Color(0x1FFFFFFF); // 12% White
+  static const Color glassSurfaceMedium = Color(0x33FFFFFF); // 20% White
+  static const Color glassBorder = Color(0x40FFFFFF); // 25% White
+  static const Color glassBorderGlow = Color(0x80FFFFFF); // 50% White
 
-  static const Color textPrimary = Color(0xFF1A1A2E);
-  static const Color textSecondary = Color(0xFF6B7280);
-  static const Color textHint = Color(0xFF9CA3AF);
+  // ── Typography ────────────────────────────────────────────────────────────
+  static const Color textPrimary = Colors.white;
+  static const Color textSecondary = Color(0xFF94A3B8); // Slate 400
+  static const Color textMuted = Color(0xFF64748B); // Slate 500
 
-  static const Color border = Color(0xFFE5E7EB);
-
-  static const Color white = Colors.white;
-  static const Color black = Color(0xFF1A1A2E);
+  // ── Functional ────────────────────────────────────────────────────────────
   static const Color error = Color(0xFFEF4444);
-  static const Color success = Color(0xFF10B981);
+  static const Color success = Color(0xFF00E676);
 }

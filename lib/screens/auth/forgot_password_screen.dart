@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../services/auth_service.dart';
+import '../../widgets/glass/glass_background.dart';
+import '../../widgets/glass/glass_button.dart';
+import '../../widgets/glass/glass_container.dart';
+import '../../widgets/glass/glass_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -28,10 +31,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please enter your email address'),
-          backgroundColor: Colors.red.shade400,
+          backgroundColor: Colors.redAccent.shade700,
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       );
       return;
@@ -48,10 +50,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message ?? 'Failed to send reset email'),
-          backgroundColor: Colors.red.shade400,
+          backgroundColor: Colors.redAccent.shade700,
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       );
     } catch (e) {
@@ -59,10 +60,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),
-          backgroundColor: Colors.red.shade400,
+          backgroundColor: Colors.redAccent.shade700,
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       );
     } finally {
@@ -73,68 +73,44 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      body: Stack(
-        children: [
-          // Green gradient top
-          Container(
-            height: 200,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF00C853), Color(0xFF1A6B3A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-
-          SafeArea(
+      body: GlassBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back button + title in header
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new,
-                            color: Colors.white, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Text(
-                        'Reset Password',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                // Back Button
+                GlassContainer(
+                  width: 44,
+                  height: 44,
+                  borderRadius: BorderRadius.circular(14),
+                  blur: 16,
+                  opacity: 0.1,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white, size: 18),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
 
-                // White card body
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 8),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(32)),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(28),
-                      child: _emailSent
-                          ? _buildSuccessState()
-                          : _buildFormState(),
-                    ),
-                  ),
+                const Spacer(),
+
+                // Center Glass Card
+                GlassContainer(
+                  padding: const EdgeInsets.all(24),
+                  borderRadius: BorderRadius.circular(28),
+                  blur: 24,
+                  opacity: 0.12,
+                  child: _emailSent ? _buildSuccessState() : _buildFormState(),
                 ),
+
+                const Spacer(flex: 2),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -142,55 +118,43 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildSuccessState() {
     return Column(
       children: [
-        const SizedBox(height: 40),
         Container(
-          width: 100,
-          height: 100,
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
-            color: const Color(0xFFE8FFF0),
-            borderRadius: BorderRadius.circular(50),
+            color: const Color(0xFF00E676).withValues(alpha: 0.15),
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFF00E676), width: 1.5),
           ),
           child: const Icon(
-            Icons.mark_email_read_outlined,
-            size: 52,
-            color: Color(0xFF00C853),
+            Icons.mark_email_read_rounded,
+            size: 44,
+            color: Color(0xFF00E676),
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 20),
         const Text(
-          'Check Your Email!',
+          'Check Your Inbox!',
           style: TextStyle(
-            fontSize: 26,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A2E),
+            color: Colors.white,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text(
-          'We\'ve sent a password reset link to\n${_emailController.text.trim()}',
+          'We\'ve transmitted a reset link to\n${_emailController.text.trim()}',
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 15,
-            color: Color(0xFF6B7280),
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.white.withValues(alpha: 0.7),
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 40),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF00C853),
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 56),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-            elevation: 0,
-          ),
+        const SizedBox(height: 28),
+        GlassButton(
+          text: 'BACK TO LOGIN',
           onPressed: () => Navigator.pop(context),
-          child: const Text(
-            'Back to Login',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
         ),
       ],
     );
@@ -200,98 +164,54 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 28),
         Container(
-          width: 72,
-          height: 72,
+          width: 60,
+          height: 60,
           decoration: BoxDecoration(
-            color: const Color(0xFFE8FFF0),
-            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFF00E5FF), width: 1.2),
           ),
           child: const Icon(
-            Icons.lock_reset_outlined,
-            size: 38,
-            color: Color(0xFF00C853),
+            Icons.lock_reset_rounded,
+            size: 32,
+            color: Color(0xFF00E5FF),
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'Recover Password',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Enter your registered email to receive quantum credentials reset instructions.',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.white.withValues(alpha: 0.7),
+            height: 1.4,
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Forgot Password?',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A2E),
-          ),
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          'No worries! Enter your registered email address and we\'ll send you a link to reset your password.',
-          style: TextStyle(
-            fontSize: 14,
-            color: Color(0xFF6B7280),
-            height: 1.5,
-          ),
-        ),
-        const SizedBox(height: 36),
-        TextFormField(
+        GlassTextField(
           controller: _emailController,
+          labelText: "Email Address",
+          hintText: "driver@chargelink.com",
+          prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color(0xFFF5F7FA),
-            prefixIcon: const Icon(Icons.email_outlined,
-                color: Color(0xFF00C853)),
-            labelText: 'Email Address',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide:
-                  const BorderSide(color: Color(0xFF00C853), width: 2),
-            ),
-          ),
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => _resetPassword(),
         ),
-        const SizedBox(height: 32),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF00C853),
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 56),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-            elevation: 0,
-          ),
-          onPressed: _isLoading ? null : _resetPassword,
-          child: _isLoading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : const Text(
-                  'Send Reset Link',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-        ),
-        const SizedBox(height: 20),
-        Center(
-          child: TextButton.icon(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back, size: 16),
-            label: const Text('Back to Login'),
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF6B7280),
-            ),
-          ),
+        const SizedBox(height: 24),
+        GlassButton(
+          text: 'SEND RESET LINK',
+          isLoading: _isLoading,
+          icon: Icons.send_rounded,
+          onPressed: _resetPassword,
         ),
       ],
     );

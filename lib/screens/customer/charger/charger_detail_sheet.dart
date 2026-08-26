@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/charger_model.dart';
+import '../../../widgets/glass/glass_button.dart';
+import '../../../widgets/glass/glass_container.dart';
 import '../booking/booking_screen.dart';
 
 class ChargerDetailSheet extends StatelessWidget {
@@ -9,12 +11,13 @@ class ChargerDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      blur: 28,
+      opacity: 0.45,
+      color: const Color(0xFF0B132B),
+      borderColor: Colors.white.withValues(alpha: 0.2),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +28,7 @@ class ChargerDetailSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -42,47 +45,51 @@ class ChargerDetailSheet extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A2E),
+                    color: Colors.white,
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: charger.isAvailable
-                      ? const Color(0xFFE8FFF0)
-                      : Colors.red.shade100,
+                      ? const Color(0xFF00E676).withValues(alpha: 0.2)
+                      : Colors.redAccent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: charger.isAvailable
+                        ? const Color(0xFF00E676).withValues(alpha: 0.5)
+                        : Colors.redAccent.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Text(
                   charger.isAvailable ? '● Available' : '● Busy',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                    fontSize: 12,
                     color: charger.isAvailable
-                        ? const Color(0xFF00C853)
-                        : Colors.red.shade700,
+                        ? const Color(0xFF00E676)
+                        : Colors.redAccent.shade100,
                   ),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
           // Address
           Row(
             children: [
-              const Icon(Icons.location_on_rounded, size: 16, color: Color(0xFF6B7280)),
+              Icon(Icons.location_on_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   charger.address,
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
-                    fontSize: 14,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 13,
                   ),
                 ),
               ),
@@ -90,23 +97,23 @@ class ChargerDetailSheet extends StatelessWidget {
           ),
 
           const SizedBox(height: 18),
-          const Divider(color: Color(0xFFE5E7EB)),
+          Divider(color: Colors.white.withValues(alpha: 0.15)),
           const SizedBox(height: 16),
 
-          // Info grid
+          // 2x2 Glass Specs Grid
           Row(
             children: [
-              _infoTile(
+              _glassSpecTile(
                 icon: Icons.bolt_rounded,
-                iconColor: Colors.amber.shade700,
-                label: 'Power Speed',
+                iconColor: const Color(0xFFFFB300),
+                label: 'Charging Speed',
                 value: charger.powerLabel,
               ),
               const SizedBox(width: 12),
-              _infoTile(
+              _glassSpecTile(
                 icon: Icons.electrical_services_rounded,
-                iconColor: const Color(0xFF3B82F6),
-                label: 'Connector',
+                iconColor: const Color(0xFF00E5FF),
+                label: 'Connector Standard',
                 value: charger.connectorType,
               ),
             ],
@@ -116,16 +123,16 @@ class ChargerDetailSheet extends StatelessWidget {
 
           Row(
             children: [
-              _infoTile(
+              _glassSpecTile(
                 icon: Icons.currency_rupee_rounded,
-                iconColor: const Color(0xFF00C853),
-                label: 'Price Rate',
+                iconColor: const Color(0xFF00E676),
+                label: 'Energy Rate',
                 value: '₹${charger.pricePerKwh.toStringAsFixed(0)} / kWh',
               ),
               const SizedBox(width: 12),
-              _infoTile(
+              _glassSpecTile(
                 icon: Icons.star_rounded,
-                iconColor: Colors.amber.shade600,
+                iconColor: const Color(0xFFFFB300),
                 label: 'User Rating',
                 value: charger.ratingLabel,
               ),
@@ -134,41 +141,22 @@ class ChargerDetailSheet extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Book Now button
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    charger.isAvailable ? const Color(0xFF00C853) : Colors.grey.shade400,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                elevation: charger.isAvailable ? 2 : 0,
-                shadowColor: const Color(0xFF00C853).withValues(alpha: 0.4),
-              ),
-              icon: const Icon(Icons.flash_on_rounded, color: Colors.white),
-              label: Text(
-                charger.isAvailable ? 'Book Charging Slot' : 'Currently Busy',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              onPressed: charger.isAvailable
-                  ? () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BookingScreen(charger: charger),
-                        ),
-                      );
-                    }
-                  : null,
-            ),
+          // Book Now Glass Button
+          GlassButton(
+            text: charger.isAvailable ? 'RESERVE CHARGING SLOT' : 'CURRENTLY OCCUPIED',
+            icon: Icons.flash_on_rounded,
+            color: charger.isAvailable ? const Color(0xFF00E676) : null,
+            onPressed: charger.isAvailable
+                ? () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BookingScreen(charger: charger),
+                      ),
+                    );
+                  }
+                : null,
           ),
 
           const SizedBox(height: 8),
@@ -177,27 +165,25 @@ class ChargerDetailSheet extends StatelessWidget {
     );
   }
 
-  Widget _infoTile({
+  Widget _glassSpecTile({
     required IconData icon,
     required Color iconColor,
     required String label,
     required String value,
   }) {
     return Expanded(
-      child: Container(
+      child: GlassContainer(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F7FA),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
-        ),
+        borderRadius: BorderRadius.circular(16),
+        blur: 16,
+        opacity: 0.1,
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
+                color: iconColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, size: 20, color: iconColor),
             ),
@@ -208,9 +194,9 @@ class ChargerDetailSheet extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: Color(0xFF6B7280),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                   Text(
@@ -218,7 +204,7 @@ class ChargerDetailSheet extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A2E),
+                      color: Colors.white,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -231,4 +217,3 @@ class ChargerDetailSheet extends StatelessWidget {
     );
   }
 }
-

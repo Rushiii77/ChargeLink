@@ -3,6 +3,9 @@ import '../../../models/booking_model.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/booking_service.dart';
+import '../../../widgets/glass/glass_background.dart';
+import '../../../widgets/glass/glass_button.dart';
+import '../../../widgets/glass/glass_container.dart';
 
 class BookingScreen extends StatefulWidget {
   final ChargerModel charger;
@@ -52,7 +55,6 @@ class _BookingScreenState extends State<BookingScreen> {
 
   double get _totalPrice {
     final hours = _selectedDurationMinutes / 60.0;
-    // Estimated energy * price per kWh
     final energy = widget.charger.powerKw * hours;
     return energy * widget.charger.pricePerKwh;
   }
@@ -82,8 +84,9 @@ class _BookingScreenState extends State<BookingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Please sign in to book a charger"),
-          backgroundColor: Colors.red.shade400,
+          backgroundColor: Colors.redAccent.shade700,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       );
       return;
@@ -108,8 +111,9 @@ class _BookingScreenState extends State<BookingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Failed to complete booking: $e"),
-            backgroundColor: Colors.red.shade400,
+            backgroundColor: Colors.redAccent.shade700,
             behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
         );
       }
@@ -123,7 +127,11 @@ class _BookingScreenState extends State<BookingScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: const Color(0xFF0B132B),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+        ),
         content: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
@@ -132,13 +140,14 @@ class _BookingScreenState extends State<BookingScreen> {
               Container(
                 width: 80,
                 height: 80,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE8FFF0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00E676).withValues(alpha: 0.15),
                   shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFF00E676), width: 1.5),
                 ),
                 child: const Icon(
                   Icons.check_circle_rounded,
-                  color: Color(0xFF00C853),
+                  color: Color(0xFF00E676),
                   size: 52,
                 ),
               ),
@@ -148,37 +157,35 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 "Your charging slot at ${booking.chargerName} is confirmed.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: Color(0xFF6B7280),
+                  color: Colors.white.withValues(alpha: 0.7),
                   height: 1.4,
                 ),
               ),
               const SizedBox(height: 20),
 
               // PIN Box
-              Container(
+              GlassContainer(
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F7FA),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
-                ),
+                borderRadius: BorderRadius.circular(20),
+                blur: 16,
+                opacity: 0.1,
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       "STATION CHECK-IN PIN",
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF6B7280),
+                        color: Colors.white.withValues(alpha: 0.6),
                         letterSpacing: 1.1,
                       ),
                     ),
@@ -186,9 +193,9 @@ class _BookingScreenState extends State<BookingScreen> {
                     Text(
                       booking.otpPin,
                       style: const TextStyle(
-                        fontSize: 32,
+                        fontSize: 34,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF00C853),
+                        color: Color(0xFF00E676),
                         letterSpacing: 6,
                       ),
                     ),
@@ -197,27 +204,14 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
               const SizedBox(height: 24),
 
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00C853),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(ctx); // Close dialog
-                    Navigator.pop(context); // Return from booking screen
-                    Navigator.pushNamed(context, '/my-bookings');
-                  },
-                  child: const Text(
-                    "View My Bookings",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                ),
+              GlassButton(
+                text: "VIEW MY BOOKINGS",
+                icon: Icons.calendar_month_rounded,
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/my-bookings');
+                },
               ),
             ],
           ),
@@ -229,99 +223,92 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
-        title: const Text(
-          "Reserve Charging Slot",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Station Summary Card
-            _buildStationHeader(),
-
-            const SizedBox(height: 24),
-
-            // 1. Select Date
-            _buildSectionTitle("1. Select Date"),
-            const SizedBox(height: 10),
-            _buildDateSelector(),
-
-            const SizedBox(height: 24),
-
-            // 2. Select Time Slot
-            _buildSectionTitle("2. Select Time Slot"),
-            const SizedBox(height: 10),
-            _buildTimeSlotSelector(),
-
-            const SizedBox(height: 24),
-
-            // 3. Charging Duration
-            _buildSectionTitle("3. Charging Duration"),
-            const SizedBox(height: 10),
-            _buildDurationSelector(),
-
-            const SizedBox(height: 24),
-
-            // 4. Target Battery % (Smart Estimation)
-            _buildSectionTitle("4. Target Battery % (Estimator)"),
-            const SizedBox(height: 10),
-            _buildBatteryEstimator(),
-
-            const SizedBox(height: 24),
-
-            // Price Breakdown Card
-            _buildPriceSummary(),
-
-            const SizedBox(height: 28),
-
-            // Reserve Slot Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00C853),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                  elevation: 2,
-                  shadowColor: const Color(0xFF00C853).withValues(alpha: 0.4),
-                ),
-                onPressed: _isLoading ? null : _confirmBooking,
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : Text(
-                        "CONFIRM & PAY ₹${_totalPrice.toStringAsFixed(0)}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.8,
-                        ),
+      body: GlassBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top App Bar
+                Row(
+                  children: [
+                    GlassContainer(
+                      width: 44,
+                      height: 44,
+                      borderRadius: BorderRadius.circular(14),
+                      blur: 16,
+                      opacity: 0.1,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                        onPressed: () => Navigator.pop(context),
                       ),
-              ),
-            ),
+                    ),
+                    const SizedBox(width: 14),
+                    const Text(
+                      "Reserve Charging Slot",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
 
-            const SizedBox(height: 16),
-          ],
+                const SizedBox(height: 20),
+
+                // Station Summary Card
+                _buildStationHeader(),
+
+                const SizedBox(height: 24),
+
+                // 1. Select Date
+                _buildSectionTitle("1. Select Date"),
+                const SizedBox(height: 10),
+                _buildDateSelector(),
+
+                const SizedBox(height: 24),
+
+                // 2. Select Time Slot
+                _buildSectionTitle("2. Select Time Slot"),
+                const SizedBox(height: 10),
+                _buildTimeSlotSelector(),
+
+                const SizedBox(height: 24),
+
+                // 3. Charging Duration
+                _buildSectionTitle("3. Charging Duration"),
+                const SizedBox(height: 10),
+                _buildDurationSelector(),
+
+                const SizedBox(height: 24),
+
+                // 4. Battery Estimator
+                _buildSectionTitle("4. Target Battery % (Estimator)"),
+                const SizedBox(height: 10),
+                _buildBatteryEstimator(),
+
+                const SizedBox(height: 24),
+
+                // Price Breakdown Card
+                _buildPriceSummary(),
+
+                const SizedBox(height: 28),
+
+                // Confirm Button
+                GlassButton(
+                  text: "CONFIRM & PAY ₹${_totalPrice.toStringAsFixed(0)}",
+                  isLoading: _isLoading,
+                  icon: Icons.bolt_rounded,
+                  onPressed: _confirmBooking,
+                ),
+
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -331,40 +318,33 @@ class _BookingScreenState extends State<BookingScreen> {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: FontWeight.bold,
-        color: Color(0xFF1A1A2E),
+        color: Colors.white,
+        letterSpacing: 0.5,
       ),
     );
   }
 
   Widget _buildStationHeader() {
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+      borderRadius: BorderRadius.circular(24),
+      blur: 20,
+      opacity: 0.14,
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFE8FFF0),
-              borderRadius: BorderRadius.circular(14),
+              color: const Color(0xFF00E676).withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.4)),
             ),
             child: const Icon(
               Icons.ev_station_rounded,
-              color: Color(0xFF00C853),
-              size: 32,
+              color: Color(0xFF00E676),
+              size: 28,
             ),
           ),
           const SizedBox(width: 14),
@@ -377,15 +357,15 @@ class _BookingScreenState extends State<BookingScreen> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A2E),
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
                   widget.charger.address,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF6B7280),
+                    color: Colors.white.withValues(alpha: 0.65),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -398,22 +378,23 @@ class _BookingScreenState extends State<BookingScreen> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1A1A2E),
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
+                        color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.3)),
                       ),
                       child: Text(
                         widget.charger.connectorType,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700,
+                          color: Color(0xFF00E5FF),
                         ),
                       ),
                     ),
@@ -430,7 +411,6 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget _buildDateSelector() {
     final now = DateTime.now();
     final dates = List.generate(7, (index) => now.add(Duration(days: index)));
-
     final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -444,48 +424,36 @@ class _BookingScreenState extends State<BookingScreen> {
           final isSelected = d.day == _selectedDate.day && d.month == _selectedDate.month;
           final dayName = index == 0 ? 'Today' : (index == 1 ? 'Tmrw' : weekdays[d.weekday - 1]);
 
-          return GestureDetector(
+          return GlassContainer(
+            width: 68,
+            margin: const EdgeInsets.only(right: 10),
+            borderRadius: BorderRadius.circular(18),
+            blur: 16,
+            opacity: isSelected ? 0.3 : 0.08,
+            borderColor: isSelected ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.15),
+            glowColor: isSelected ? const Color(0xFF00E676) : null,
             onTap: () => setState(() => _selectedDate = d),
-            child: Container(
-              width: 68,
-              margin: const EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF00C853) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isSelected ? const Color(0xFF00C853) : const Color(0xFFE5E7EB),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  dayName,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? const Color(0xFF00E676) : Colors.white60,
+                  ),
                 ),
-                boxShadow: [
-                  if (isSelected)
-                    BoxShadow(
-                      color: const Color(0xFF00C853).withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    dayName,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.white : const Color(0xFF6B7280),
-                    ),
+                const SizedBox(height: 4),
+                Text(
+                  "${d.day} ${months[d.month - 1]}",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.8),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "${d.day} ${months[d.month - 1]}",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: isSelected ? Colors.white : const Color(0xFF1A1A2E),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },
@@ -495,43 +463,37 @@ class _BookingScreenState extends State<BookingScreen> {
 
   Widget _buildTimeSlotSelector() {
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 8,
+      runSpacing: 8,
       children: List.generate(_timeSlots.length, (index) {
         final slot = _timeSlots[index];
         final isSelected = index == _selectedSlotIndex;
 
-        return GestureDetector(
+        return GlassContainer(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          borderRadius: BorderRadius.circular(14),
+          blur: 16,
+          opacity: isSelected ? 0.25 : 0.08,
+          borderColor: isSelected ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.15),
           onTap: () => setState(() => _selectedSlotIndex = index),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFE8FFF0) : Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isSelected ? const Color(0xFF00C853) : const Color(0xFFE5E7EB),
-                width: isSelected ? 2 : 1,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.access_time_rounded,
+                size: 13,
+                color: isSelected ? const Color(0xFF00E676) : Colors.white60,
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.access_time_rounded,
-                  size: 14,
-                  color: isSelected ? const Color(0xFF00C853) : const Color(0xFF6B7280),
+              const SizedBox(width: 6),
+              Text(
+                slot,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? const Color(0xFF00E676) : Colors.white70,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  slot,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? const Color(0xFF00C853) : const Color(0xFF1A1A2E),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       }),
@@ -547,20 +509,22 @@ class _BookingScreenState extends State<BookingScreen> {
           final label = mins < 60 ? '$mins mins' : '${mins / 60} hrs';
 
           return Padding(
-            padding: const EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
               label: Text(label),
               selected: isSelected,
               onSelected: (_) => setState(() => _selectedDurationMinutes = mins),
-              selectedColor: const Color(0xFFE8FFF0),
+              selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
+              backgroundColor: Colors.white.withValues(alpha: 0.08),
               labelStyle: TextStyle(
-                color: isSelected ? const Color(0xFF00C853) : const Color(0xFF1A1A2E),
+                color: isSelected ? const Color(0xFF00E676) : Colors.white70,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontSize: 12,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                  color: isSelected ? const Color(0xFF00C853) : const Color(0xFFE5E7EB),
+                  color: isSelected ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.15),
                 ),
               ),
             ),
@@ -571,13 +535,11 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Widget _buildBatteryEstimator() {
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
+      borderRadius: BorderRadius.circular(20),
+      blur: 16,
+      opacity: 0.1,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -586,10 +548,10 @@ class _BookingScreenState extends State<BookingScreen> {
             children: [
               Text(
                 "Current: ${_currentBattery.toInt()}%",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF6B7280),
+                  color: Colors.white.withValues(alpha: 0.65),
                 ),
               ),
               Text(
@@ -597,17 +559,16 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF00C853),
+                  color: Color(0xFF00E676),
                 ),
               ),
             ],
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: const Color(0xFF00C853),
-              inactiveTrackColor: const Color(0xFFE5E7EB),
-              thumbColor: const Color(0xFF00C853),
-              trackHeight: 6,
+              activeTrackColor: const Color(0xFF00E676),
+              inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
+              thumbColor: const Color(0xFF00E676),
             ),
             child: Slider(
               value: _targetBattery,
@@ -620,17 +581,18 @@ class _BookingScreenState extends State<BookingScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F7FA),
+              color: Colors.white.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.bolt_rounded, size: 18, color: Color(0xFFF59E0B)),
+                const Icon(Icons.bolt_rounded, size: 16, color: Color(0xFFFFB300)),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    "Est. ~${_estimatedEnergyKwh.toStringAsFixed(1)} kWh to be delivered in $_selectedDurationMinutes mins.",
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF1A1A2E)),
+                    "Est. ~${_estimatedEnergyKwh.toStringAsFixed(1)} kWh delivered in $_selectedDurationMinutes mins.",
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
                   ),
                 ),
               ],
@@ -642,13 +604,11 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Widget _buildPriceSummary() {
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
+      borderRadius: BorderRadius.circular(22),
+      blur: 20,
+      opacity: 0.12,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -657,7 +617,7 @@ class _BookingScreenState extends State<BookingScreen> {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A2E),
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 12),
@@ -665,8 +625,8 @@ class _BookingScreenState extends State<BookingScreen> {
           const SizedBox(height: 6),
           _buildFareRow("Estimated Energy", "~${_estimatedEnergyKwh.toStringAsFixed(1)} kWh"),
           const SizedBox(height: 6),
-          _buildFareRow("Platform Fee", "FREE (₹0)"),
-          const Divider(height: 24, color: Color(0xFFE5E7EB)),
+          _buildFareRow("Platform Quantum Fee", "FREE (₹0)"),
+          Divider(height: 24, color: Colors.white.withValues(alpha: 0.15)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -675,15 +635,15 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
+                  color: Colors.white,
                 ),
               ),
               Text(
                 "₹${_totalPrice.toStringAsFixed(0)}",
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF00C853),
+                  color: Color(0xFF00E676),
                 ),
               ),
             ],
@@ -697,8 +657,8 @@ class _BookingScreenState extends State<BookingScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280))),
-        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
+        Text(label, style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.65))),
+        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
       ],
     );
   }

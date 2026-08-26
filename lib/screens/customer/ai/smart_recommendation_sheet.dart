@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/ai_recommendation_service.dart';
+import '../../../widgets/glass/glass_container.dart';
 import '../booking/booking_screen.dart';
 
 class SmartRecommendationSheet extends StatefulWidget {
@@ -40,12 +41,13 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
       preference: _selectedPreference,
     );
 
-    return Container(
+    return GlassContainer(
       height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      blur: 28,
+      opacity: 0.45,
+      color: const Color(0xFF0B132B),
+      borderColor: Colors.white.withValues(alpha: 0.2),
       child: Column(
         children: [
           // Drag handle
@@ -54,13 +56,13 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
           const SizedBox(height: 16),
 
-          // Header with AI Sparkles icon
+          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
@@ -68,37 +70,43 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8FFF0),
+                    color: const Color(0xFF00E676).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFF00E676).withValues(alpha: 0.4),
+                    ),
                   ),
                   child: const Icon(
                     Icons.auto_awesome_rounded,
-                    color: Color(0xFF00C853),
-                    size: 24,
+                    color: Color(0xFF00E676),
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 14),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Smart AI Recommender",
+                      const Text(
+                        "AI Quantum Matcher",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1A2E),
+                          color: Colors.white,
                         ),
                       ),
                       Text(
-                        "Instant match based on your battery & goals",
-                        style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        "Real-time scoring based on battery telemetry",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white.withValues(alpha: 0.65),
+                        ),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Color(0xFF6B7280)),
+                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -106,23 +114,21 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
           ),
 
           const SizedBox(height: 14),
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
 
-          // Scrollable Settings & Recommendations
+          // Scrollable Content
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Battery Slider Box
-                  Container(
+                  // Battery Slider Glass Card
+                  GlassContainer(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
-                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    blur: 16,
+                    opacity: 0.1,
                     child: Column(
                       children: [
                         Row(
@@ -130,10 +136,10 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                           children: [
                             Text(
                               "Current: ${_currentBattery.toInt()}%",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF6B7280),
+                                color: Colors.white.withValues(alpha: 0.7),
                               ),
                             ),
                             Text(
@@ -141,16 +147,16 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF00C853),
+                                color: Color(0xFF00E676),
                               ),
                             ),
                           ],
                         ),
                         SliderTheme(
                           data: SliderTheme.of(context).copyWith(
-                            activeTrackColor: const Color(0xFF00C853),
-                            inactiveTrackColor: const Color(0xFFE5E7EB),
-                            thumbColor: const Color(0xFF00C853),
+                            activeTrackColor: const Color(0xFF00E676),
+                            inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
+                            thumbColor: const Color(0xFF00E676),
                             trackHeight: 6,
                           ),
                           child: Slider(
@@ -167,13 +173,13 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
 
                   const SizedBox(height: 18),
 
-                  // Goal Chips
+                  // Strategy Goal Chips
                   const Text(
-                    "Optimization Priority",
+                    "Optimization Goal",
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A2E),
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -189,19 +195,19 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                             selected: isSelected,
                             onSelected: (_) =>
                                 setState(() => _selectedPreference = pref),
-                            selectedColor: const Color(0xFFE8FFF0),
+                            selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
+                            backgroundColor: Colors.white.withValues(alpha: 0.08),
                             labelStyle: TextStyle(
-                              color: isSelected
-                                  ? const Color(0xFF00C853)
-                                  : const Color(0xFF1A1A2E),
+                              color: isSelected ? const Color(0xFF00E676) : Colors.white70,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              fontSize: 12,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                               side: BorderSide(
                                 color: isSelected
-                                    ? const Color(0xFF00C853)
-                                    : const Color(0xFFE5E7EB),
+                                    ? const Color(0xFF00E676)
+                                    : Colors.white.withValues(alpha: 0.15),
                               ),
                             ),
                           ),
@@ -212,24 +218,24 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
 
                   const SizedBox(height: 24),
 
-                  // Recommendations List
+                  // Match List
                   Text(
-                    "Top Matches (${recommendations.length})",
+                    "Optimal Matches (${recommendations.length})",
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A2E),
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 12),
 
                   if (recommendations.isEmpty)
-                    const Center(
+                    Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Text(
                           "No stations available for this criteria.",
-                          style: TextStyle(color: Color(0xFF6B7280)),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
                         ),
                       ),
                     )
@@ -245,154 +251,169 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
   }
 
   Widget _buildRecommendationCard(RecommendationResult rec) {
-    return Container(
+    return GlassContainer(
       margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: rec.score > 85 ? const Color(0xFF00C853) : const Color(0xFFE5E7EB),
-          width: rec.score > 85 ? 1.5 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(22),
+      blur: 20,
+      opacity: 0.12,
+      borderColor: rec.score > 85
+          ? const Color(0xFF00E676).withValues(alpha: 0.5)
+          : Colors.white.withValues(alpha: 0.15),
+      borderWidth: rec.score > 85 ? 1.5 : 1,
+      glowColor: rec.score > 85 ? const Color(0xFF00E676) : null,
+      glowSpread: rec.score > 85 ? 1 : 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Row: Tag + Score
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00E676).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: const Color(0xFF00E676).withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.star_rounded, size: 14, color: Color(0xFF00E676)),
+                    const SizedBox(width: 4),
+                    Text(
+                      rec.tag,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF00E676),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                ),
+                child: Text(
+                  "${rec.score.toInt()}% Match",
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // Name
+          Text(
+            rec.charger.name,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            rec.charger.address,
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white.withValues(alpha: 0.65),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          const SizedBox(height: 10),
+
+          // Reasoning Note
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.bolt_rounded, size: 16, color: Color(0xFFFFB300)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    rec.reasoning,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Specs + Button
+          Row(
+            children: [
+              Text(
+                "~${rec.estimatedTimeMinutes.toInt()} mins",
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text("•", style: TextStyle(color: Colors.white.withValues(alpha: 0.4))),
+              const SizedBox(width: 8),
+              Text(
+                "Est. ₹${rec.estimatedCost.toStringAsFixed(0)}",
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF00E676),
+                ),
+              ),
+              const Spacer(),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00E676),
+                  foregroundColor: const Color(0xFF0B132B),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BookingScreen(charger: rec.charger),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Book Slot",
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
         ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row: Tag + Score Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8FFF0),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.star_rounded, size: 14, color: Color(0xFF00C853)),
-                      const SizedBox(width: 4),
-                      Text(
-                        rec.tag,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF00C853),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A2E),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "${rec.score.toInt()}% Match",
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            // Station Name
-            Text(
-              rec.charger.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
-              ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              rec.charger.address,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            const SizedBox(height: 10),
-
-            // AI Reasoning Note
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F7FA),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.bolt_rounded, size: 16, color: Color(0xFFF59E0B)),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      rec.reasoning,
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF1A1A2E)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Specs Row
-            Row(
-              children: [
-                Text(
-                  "~${rec.estimatedTimeMinutes.toInt()} mins",
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
-                ),
-                const SizedBox(width: 8),
-                const Text("•", style: TextStyle(color: Color(0xFF6B7280))),
-                const SizedBox(width: 8),
-                Text(
-                  "Est. ₹${rec.estimatedCost.toStringAsFixed(0)}",
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF00C853)),
-                ),
-                const Spacer(),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00C853),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BookingScreen(charger: rec.charger),
-                      ),
-                    );
-                  },
-                  child: const Text("Book Slot", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }

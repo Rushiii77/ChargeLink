@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../widgets/glass/glass_background.dart';
+import '../../widgets/glass/glass_container.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,13 +21,13 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
 
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1400),
       vsync: this,
     );
 
     _animation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOutCubic,
+      curve: Curves.easeOutCubic,
     );
 
     _controller.forward();
@@ -46,98 +48,111 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF00C853), Color(0xFF1A6B3A)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+      body: GlassBackground(
         child: SafeArea(
-          child: FadeTransition(
-            opacity: _animation,
-            child: ScaleTransition(
-              scale: _animation,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(flex: 2),
-
-                  // Logo Icon in White Circle
-                  Container(
-                    width: 110,
-                    height: 110,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+          child: Center(
+            child: FadeTransition(
+              opacity: _animation,
+              child: ScaleTransition(
+                scale: _animation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Floating Crystal Logo Card
+                    GlassContainer(
+                      width: 140,
+                      height: 140,
+                      borderRadius: BorderRadius.circular(36),
+                      blur: 24,
+                      opacity: 0.18,
+                      glowColor: const Color(0xFF00E676),
+                      glowSpread: 4,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF00E676), Color(0xFF00E5FF)],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF00E676).withValues(alpha: 0.4),
+                                blurRadius: 16,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.ev_station_rounded,
+                            size: 48,
+                            color: Color(0xFF0B132B),
+                          ),
                         ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.ev_station_rounded,
-                      size: 60,
-                      color: Color(0xFF00C853),
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  const Text(
-                    "ChargeLink",
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Text(
-                    "Smart EV Charging Platform",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
-                  ),
-
-                  const Spacer(flex: 2),
-
-                  // Loading Spinner
-                  SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 36),
 
-                  Text(
-                    "Connecting to nearby chargers...",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.8),
+                    const Text(
+                      "ChargeLink",
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            color: Color(0xFF00E676),
+                            blurRadius: 20,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const Spacer(flex: 1),
-                ],
+                    const SizedBox(height: 8),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                      ),
+                      child: Text(
+                        "Smart EV Charging & Mobility Network",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 80),
+
+                    // Crystal Spinner
+                    const SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00E676)),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Text(
+                      "Initializing quantum grid...",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.6),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

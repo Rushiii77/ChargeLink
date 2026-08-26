@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../glass/glass_button.dart';
+import '../glass/glass_container.dart';
 
 class ChargerFilter {
   final String chargerType; // 'All', 'AC', 'DC'
@@ -59,17 +61,18 @@ class _FilterSheetState extends State<FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
+    return GlassContainer(
       padding: EdgeInsets.only(
         top: 20,
         left: 24,
         right: 24,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      blur: 28,
+      opacity: 0.45,
+      color: const Color(0xFF0B132B),
+      borderColor: Colors.white.withValues(alpha: 0.2),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +83,7 @@ class _FilterSheetState extends State<FilterSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -94,7 +97,7 @@ class _FilterSheetState extends State<FilterSheet> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
+                  color: Colors.white,
                 ),
               ),
               const Spacer(),
@@ -118,7 +121,7 @@ class _FilterSheetState extends State<FilterSheet> {
           const SizedBox(height: 16),
 
           // Charger Type
-          _buildSectionLabel('Charger Type'),
+          _buildSectionLabel('Current Standard'),
           const SizedBox(height: 8),
           _buildChipGroup(
             options: ['All', 'AC', 'DC'],
@@ -130,7 +133,7 @@ class _FilterSheetState extends State<FilterSheet> {
           const SizedBox(height: 16),
 
           // Connector Type
-          _buildSectionLabel('Connector Type'),
+          _buildSectionLabel('Connector Port'),
           const SizedBox(height: 8),
           _buildChipGroup(
             options: ['All', 'CCS2', 'Type2', 'CHAdeMO'],
@@ -142,7 +145,7 @@ class _FilterSheetState extends State<FilterSheet> {
           const SizedBox(height: 16),
 
           // Minimum Power
-          _buildSectionLabel('Minimum Power / Speed'),
+          _buildSectionLabel('Minimum Speed Rating'),
           const SizedBox(height: 8),
           _buildChipGroupDouble(
             options: const [0, 7.4, 22, 50, 100],
@@ -154,49 +157,30 @@ class _FilterSheetState extends State<FilterSheet> {
 
           const SizedBox(height: 16),
 
-          // Availability
-          _buildSectionLabel('Availability'),
-          const SizedBox(height: 4),
+          // Availability Switch
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
             title: const Text(
               'Show available stations only',
-              style: TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+              style: TextStyle(fontSize: 14, color: Colors.white),
             ),
             value: _filter.availableOnly,
-            activeTrackColor: const Color(0xFF00C853).withValues(alpha: 0.5),
-            activeThumbColor: const Color(0xFF00C853),
+            activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.5),
+            activeThumbColor: const Color(0xFF00E676),
             onChanged: (v) =>
                 setState(() => _filter = _filter.copyWith(availableOnly: v)),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
           // Apply button
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00C853),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(26),
-                ),
-                elevation: 0,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                widget.onApply(_filter);
-              },
-              child: const Text(
-                'Apply Filters',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+          GlassButton(
+            text: 'APPLY FILTERS',
+            icon: Icons.check_rounded,
+            onPressed: () {
+              Navigator.pop(context);
+              widget.onApply(_filter);
+            },
           ),
         ],
       ),
@@ -206,10 +190,10 @@ class _FilterSheetState extends State<FilterSheet> {
   Widget _buildSectionLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(
-        fontSize: 14,
+      style: TextStyle(
+        fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1A1A2E),
+        color: Colors.white.withValues(alpha: 0.8),
       ),
     );
   }
@@ -227,15 +211,19 @@ class _FilterSheetState extends State<FilterSheet> {
           label: Text(opt),
           selected: isSelected,
           onSelected: (_) => onSelected(opt),
-          selectedColor: const Color(0xFFE8FFF0),
+          selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
+          backgroundColor: Colors.white.withValues(alpha: 0.08),
           labelStyle: TextStyle(
-            color: isSelected ? const Color(0xFF00C853) : const Color(0xFF1A1A2E),
+            color: isSelected ? const Color(0xFF00E676) : Colors.white70,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 12,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             side: BorderSide(
-              color: isSelected ? const Color(0xFF00C853) : const Color(0xFFE5E7EB),
+              color: isSelected
+                  ? const Color(0xFF00E676)
+                  : Colors.white.withValues(alpha: 0.15),
             ),
           ),
         );
@@ -257,15 +245,19 @@ class _FilterSheetState extends State<FilterSheet> {
           label: Text(labels[i]),
           selected: isSelected,
           onSelected: (_) => onSelected(options[i]),
-          selectedColor: const Color(0xFFE8FFF0),
+          selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
+          backgroundColor: Colors.white.withValues(alpha: 0.08),
           labelStyle: TextStyle(
-            color: isSelected ? const Color(0xFF00C853) : const Color(0xFF1A1A2E),
+            color: isSelected ? const Color(0xFF00E676) : Colors.white70,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 12,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             side: BorderSide(
-              color: isSelected ? const Color(0xFF00C853) : const Color(0xFFE5E7EB),
+              color: isSelected
+                  ? const Color(0xFF00E676)
+                  : Colors.white.withValues(alpha: 0.15),
             ),
           ),
         );
@@ -273,4 +265,3 @@ class _FilterSheetState extends State<FilterSheet> {
     );
   }
 }
-
