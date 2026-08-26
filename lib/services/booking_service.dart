@@ -11,15 +11,25 @@ class BookingService {
     return (1000 + random.nextInt(9000)).toString();
   }
 
+  String _generateTransactionId() {
+    final random = Random();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final randSuffix = 1000 + random.nextInt(9000);
+    return 'TXN_${timestamp}_$randSuffix';
+  }
+
   Future<BookingModel> createBooking({
     required String customerId,
     required ChargerModel charger,
     required DateTime startTime,
     required int durationMinutes,
     required double totalAmount,
+    double bookingFee = 100.0,
+    String paymentMethod = 'UPI - Instant Pay',
   }) async {
     final endTime = startTime.add(Duration(minutes: durationMinutes));
     final otpPin = _generateOtpPin();
+    final transactionId = _generateTransactionId();
     final now = DateTime.now();
 
     final docRef = _firestore.collection('bookings').doc();
@@ -36,6 +46,10 @@ class BookingService {
       endTime: endTime,
       durationMinutes: durationMinutes,
       totalAmount: totalAmount,
+      bookingFee: bookingFee,
+      paymentStatus: 'paid',
+      paymentMethod: paymentMethod,
+      transactionId: transactionId,
       status: 'confirmed',
       otpPin: otpPin,
       createdAt: now,
@@ -63,6 +77,7 @@ class BookingService {
   Future<void> cancelBooking(String bookingId) async {
     await _firestore.collection('bookings').doc(bookingId).update({
       'status': 'cancelled',
+      'paymentStatus': 'refunded',
     });
   }
 
@@ -72,4 +87,3 @@ class BookingService {
     });
   }
 }
-

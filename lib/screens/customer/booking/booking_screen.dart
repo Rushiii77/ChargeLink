@@ -6,6 +6,7 @@ import '../../../services/booking_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
+import 'payment_sheet.dart';
 
 class BookingScreen extends StatefulWidget {
   final ChargerModel charger;
@@ -26,6 +27,8 @@ class _BookingScreenState extends State<BookingScreen> {
   final double _currentBattery = 25.0;
   double _targetBattery = 85.0;
   bool _isLoading = false;
+
+  static const double _bookingFee = 100.0; // Fixed ₹100 slot reservation fee
 
   final List<String> _timeSlots = [
     '09:00 AM',
@@ -53,7 +56,7 @@ class _BookingScreenState extends State<BookingScreen> {
     return (widget.charger.powerKw * hours).clamp(5.0, 120.0);
   }
 
-  double get _totalPrice {
+  double get _estimatedTotalCharge {
     final hours = _selectedDurationMinutes / 60.0;
     final energy = widget.charger.powerKw * hours;
     return energy * widget.charger.pricePerKwh;
@@ -78,7 +81,7 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  Future<void> _confirmBooking() async {
+  Future<void> _startCheckoutFlow() async {
     final user = _authService.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,6 +95,23 @@ class _BookingScreenState extends State<BookingScreen> {
       return;
     }
 
+    // 1. Open Payment Sheet modal for ₹100 fee
+    final paymentMethod = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => PaymentSheet(
+        charger: widget.charger,
+        startTime: _calculatedStartTime,
+        durationMinutes: _selectedDurationMinutes,
+        estimatedEnergyKwh: _estimatedEnergyKwh,
+        estimatedTotalCharge: _estimatedTotalCharge,
+        bookingFee: _bookingFee,
+      ),
+    );
+
+    if (paymentMethod == null) return; // User cancelled
+
     setState(() => _isLoading = true);
 
     try {
@@ -100,7 +120,9 @@ class _BookingScreenState extends State<BookingScreen> {
         charger: widget.charger,
         startTime: _calculatedStartTime,
         durationMinutes: _selectedDurationMinutes,
-        totalAmount: _totalPrice,
+        totalAmount: _estimatedTotalCharge,
+        bookingFee: _bookingFee,
+        paymentMethod: paymentMethod,
       );
 
       if (!mounted) return;
@@ -138,8 +160,8 @@ class _BookingScreenState extends State<BookingScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 80,
-                height: 80,
+                width: 76,
+                height: 76,
                 decoration: BoxDecoration(
                   color: const Color(0xFF00E676).withValues(alpha: 0.15),
                   shape: BoxShape.circle,
@@ -148,10 +170,10 @@ class _BookingScreenState extends State<BookingScreen> {
                 child: const Icon(
                   Icons.check_circle_rounded,
                   color: Color(0xFF00E676),
-                  size: 52,
+                  size: 48,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
               const Text(
                 "Slot Reserved!",
                 style: TextStyle(
@@ -160,17 +182,24 @@ class _BookingScreenState extends State<BookingScreen> {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
-                "Your charging slot at ${booking.chargerName} is confirmed.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
+                "₹${booking.bookingFee.toStringAsFixed(0)} advance deposit paid successfully.",
+                style: const TextStyle(
                   fontSize: 13,
-                  color: Colors.white.withValues(alpha: 0.7),
-                  height: 1.4,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF00E676),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 4),
+              Text(
+                "Transaction: ${booking.transactionId}",
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(height: 18),
 
               // PIN Box
               GlassContainer(
@@ -202,7 +231,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 22),
 
               GlassButton(
                 text: "VIEW MY BOOKINGS",
@@ -297,12 +326,12 @@ class _BookingScreenState extends State<BookingScreen> {
 
                 const SizedBox(height: 28),
 
-                // Confirm Button
+                // Pay & Book Button
                 GlassButton(
-                  text: "CONFIRM & PAY ₹${_totalPrice.toStringAsFixed(0)}",
+                  text: "PAY ₹${_bookingFee.toStringAsFixed(0)} & RESERVE SLOT",
                   isLoading: _isLoading,
-                  icon: Icons.bolt_rounded,
-                  onPressed: _confirmBooking,
+                  icon: Icons.lock_outline_rounded,
+                  onPressed: _startCheckoutFlow,
                 ),
 
                 const SizedBox(height: 16),
@@ -613,7 +642,7 @@ class _BookingScreenState extends State<BookingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Fare Breakdown",
+            "Booking & Fare Summary",
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
@@ -621,27 +650,41 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ),
           const SizedBox(height: 12),
+          _buildFareRow("Slot Reservation Deposit", "₹${_bookingFee.toStringAsFixed(0)} (Payable Now)", isHighlight: true),
+          const SizedBox(height: 6),
           _buildFareRow("Energy Rate", "₹${widget.charger.pricePerKwh.toStringAsFixed(0)} / kWh"),
           const SizedBox(height: 6),
-          _buildFareRow("Estimated Energy", "~${_estimatedEnergyKwh.toStringAsFixed(1)} kWh"),
+          _buildFareRow("Estimated Energy Consumed", "~${_estimatedEnergyKwh.toStringAsFixed(1)} kWh (~₹${_estimatedTotalCharge.toStringAsFixed(0)})"),
           const SizedBox(height: 6),
-          _buildFareRow("Platform Quantum Fee", "FREE (₹0)"),
+          _buildFareRow("Escrow Security & Platform Fee", "FREE (₹0)"),
           Divider(height: 24, color: Colors.white.withValues(alpha: 0.15)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Total Amount",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Amount Due Now",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "100% Refundable Deposit",
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
               ),
               Text(
-                "₹${_totalPrice.toStringAsFixed(0)}",
+                "₹${_bookingFee.toStringAsFixed(0)}",
                 style: const TextStyle(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF00E676),
                 ),
@@ -653,12 +696,26 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  Widget _buildFareRow(String label, String value) {
+  Widget _buildFareRow(String label, String value, {bool isHighlight = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.65))),
-        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: isHighlight ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.65),
+            fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isHighlight ? const Color(0xFF00E676) : Colors.white,
+          ),
+        ),
       ],
     );
   }

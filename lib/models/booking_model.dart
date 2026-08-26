@@ -12,6 +12,10 @@ class BookingModel {
   final DateTime endTime;
   final int durationMinutes;
   final double totalAmount;
+  final double bookingFee; // ₹100 fixed slot reservation fee
+  final String paymentStatus; // 'paid', 'pending', 'refunded'
+  final String paymentMethod; // 'UPI', 'Card', 'Wallet'
+  final String transactionId;
   final String status; // 'confirmed', 'active', 'completed', 'cancelled'
   final String otpPin;
   final DateTime createdAt;
@@ -28,6 +32,10 @@ class BookingModel {
     required this.endTime,
     required this.durationMinutes,
     required this.totalAmount,
+    this.bookingFee = 100.0,
+    this.paymentStatus = 'paid',
+    this.paymentMethod = 'UPI',
+    this.transactionId = '',
     required this.status,
     required this.otpPin,
     required this.createdAt,
@@ -54,6 +62,10 @@ class BookingModel {
               : DateTime.now()),
       durationMinutes: map['durationMinutes'] ?? 60,
       totalAmount: (map['totalAmount'] ?? 0.0).toDouble(),
+      bookingFee: (map['bookingFee'] ?? 100.0).toDouble(),
+      paymentStatus: map['paymentStatus'] ?? 'paid',
+      paymentMethod: map['paymentMethod'] ?? 'UPI',
+      transactionId: map['transactionId'] ?? '',
       status: map['status'] ?? 'confirmed',
       otpPin: map['otpPin'] ?? '1234',
       createdAt: map['createdAt'] is Timestamp
@@ -76,6 +88,10 @@ class BookingModel {
       'endTime': Timestamp.fromDate(endTime),
       'durationMinutes': durationMinutes,
       'totalAmount': totalAmount,
+      'bookingFee': bookingFee,
+      'paymentStatus': paymentStatus,
+      'paymentMethod': paymentMethod,
+      'transactionId': transactionId,
       'status': status,
       'otpPin': otpPin,
       'createdAt': Timestamp.fromDate(createdAt),

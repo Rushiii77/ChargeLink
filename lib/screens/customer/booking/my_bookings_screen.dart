@@ -447,11 +447,28 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                   ),
                 ),
               ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  "Paid ₹${booking.bookingFee.toStringAsFixed(0)}",
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF00E5FF),
+                  ),
+                ),
+              ),
               const Spacer(),
               Text(
-                "₹${booking.totalAmount.toStringAsFixed(0)}",
+                "Est. ₹${booking.totalAmount.toStringAsFixed(0)}",
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
