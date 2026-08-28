@@ -6,7 +6,7 @@ import '../../../services/booking_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
-import 'payment_sheet.dart';
+import 'razorpay_mock_sheet.dart';
 
 class BookingScreen extends StatefulWidget {
   final ChargerModel charger;
@@ -95,22 +95,32 @@ class _BookingScreenState extends State<BookingScreen> {
       return;
     }
 
-    // 1. Open Payment Sheet modal for ₹100 fee
-    final paymentMethod = await showModalBottomSheet<String>(
+    // Launch Mock Razorpay Checkout Gateway for ₹100
+    final result = await showModalBottomSheet<RazorpayPaymentResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => PaymentSheet(
+      builder: (_) => RazorpayMockSheet(
         charger: widget.charger,
-        startTime: _calculatedStartTime,
-        durationMinutes: _selectedDurationMinutes,
-        estimatedEnergyKwh: _estimatedEnergyKwh,
-        estimatedTotalCharge: _estimatedTotalCharge,
-        bookingFee: _bookingFee,
+        amount: _bookingFee,
+        customerEmail: user.email ?? "driver@chargelink.com",
       ),
     );
 
-    if (paymentMethod == null) return; // User cancelled
+    if (result == null) return; // User closed checkout
+
+    if (!result.success) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.errorMessage ?? "Payment failed or was declined."),
+          backgroundColor: Colors.redAccent.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -122,7 +132,7 @@ class _BookingScreenState extends State<BookingScreen> {
         durationMinutes: _selectedDurationMinutes,
         totalAmount: _estimatedTotalCharge,
         bookingFee: _bookingFee,
-        paymentMethod: paymentMethod,
+        paymentMethod: result.paymentMethod,
       );
 
       if (!mounted) return;
@@ -199,7 +209,30 @@ class _BookingScreenState extends State<BookingScreen> {
                   color: Colors.white.withValues(alpha: 0.5),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 12),
+
+              // Razorpay Verified Badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C2340),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFF3395FF).withValues(alpha: 0.4)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.bolt_rounded, size: 14, color: Color(0xFF3395FF)),
+                    const SizedBox(width: 4),
+                    Text(
+                      "Razorpay Verified (${booking.paymentMethod})",
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
 
               // PIN Box
               GlassContainer(
