@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/charger_model.dart';
+import '../../services/theme_service.dart';
 import '../glass/glass_container.dart';
 
 class ChargerCard extends StatelessWidget {
@@ -14,17 +15,19 @@ class ChargerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return GlassContainer(
-      width: 230,
+      width: 235,
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(14),
       borderRadius: BorderRadius.circular(22),
-      blur: 20,
-      opacity: 0.35,
-      color: const Color(0xFF0B132B),
+      blur: 16,
+      opacity: isDark ? 0.35 : 0.85,
+      color: isDark ? const Color(0xFF0B132B) : Colors.white,
       borderColor: charger.isAvailable
-          ? const Color(0xFF00E676).withValues(alpha: 0.4)
-          : Colors.white.withValues(alpha: 0.15),
+          ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.4 : 0.6)
+          : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
       borderWidth: 1.2,
       glowColor: charger.isAvailable ? const Color(0xFF00E676) : null,
       glowSpread: charger.isAvailable ? 1 : 0,
@@ -40,8 +43,8 @@ class ChargerCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: charger.isAvailable
-                      ? const Color(0xFF00E676).withValues(alpha: 0.2)
-                      : Colors.redAccent.withValues(alpha: 0.2),
+                      ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15)
+                      : Colors.redAccent.withValues(alpha: isDark ? 0.2 : 0.15),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: charger.isAvailable
@@ -62,8 +65,8 @@ class ChargerCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: charger.isAvailable
-                      ? const Color(0xFF00E676).withValues(alpha: 0.2)
-                      : Colors.redAccent.withValues(alpha: 0.2),
+                      ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.12)
+                      : Colors.redAccent.withValues(alpha: isDark ? 0.2 : 0.12),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: charger.isAvailable
@@ -77,8 +80,8 @@ class ChargerCard extends StatelessWidget {
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     color: charger.isAvailable
-                        ? const Color(0xFF00E676)
-                        : Colors.redAccent.shade100,
+                        ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
+                        : Colors.redAccent.shade200,
                   ),
                 ),
               ),
@@ -90,10 +93,10 @@ class ChargerCard extends StatelessWidget {
           // Station name
           Text(
             charger.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -106,7 +109,7 @@ class ChargerCard extends StatelessWidget {
             charger.address,
             style: TextStyle(
               fontSize: 11,
-              color: Colors.white.withValues(alpha: 0.65),
+              color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -121,17 +124,17 @@ class ChargerCard extends StatelessWidget {
               const SizedBox(width: 3),
               Text(
                 charger.powerLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                  color: const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.15 : 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
@@ -142,7 +145,7 @@ class ChargerCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF00E5FF),
+                    color: Color(0xFF00B4D8),
                   ),
                 ),
               ),
@@ -156,10 +159,10 @@ class ChargerCard extends StatelessWidget {
             children: [
               Text(
                 '₹${charger.pricePerKwh.toStringAsFixed(0)}/kWh',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF00E676),
+                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
                 ),
               ),
               const Spacer(),
@@ -167,10 +170,10 @@ class ChargerCard extends StatelessWidget {
               const SizedBox(width: 2),
               Text(
                 charger.rating.toStringAsFixed(1),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
             ],

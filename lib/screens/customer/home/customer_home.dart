@@ -253,6 +253,8 @@ class _CustomerHomeState extends State<CustomerHome> {
   // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -260,7 +262,7 @@ class _CustomerHomeState extends State<CustomerHome> {
           GoogleMap(
             initialCameraPosition: _initialPosition,
             markers: _buildMarkers(),
-            style: ThemeService.isDark(context) ? MapStyles.darkMapStyle : null,
+            style: isDark ? MapStyles.darkMapStyle : null,
             onMapCreated: (controller) {
               _mapController = controller;
               _goToMyLocation();
@@ -281,9 +283,9 @@ class _CustomerHomeState extends State<CustomerHome> {
                     child: GlassContainer(
                       height: 52,
                       borderRadius: BorderRadius.circular(18),
-                      blur: 20,
-                      opacity: 0.35,
-                      color: const Color(0xFF0B132B),
+                      blur: 16,
+                      opacity: isDark ? 0.35 : 0.85,
+                      color: isDark ? const Color(0xFF0B132B) : Colors.white,
                       child: TextField(
                         onChanged: (value) {
                           setState(() {
@@ -291,12 +293,18 @@ class _CustomerHomeState extends State<CustomerHome> {
                             _applyFilters();
                           });
                         },
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style: TextStyle(
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                         cursorColor: const Color(0xFF00E676),
                         decoration: InputDecoration(
                           hintText: 'Search EV charging stations...',
                           hintStyle: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : const Color(0xFF94A3B8),
                             fontSize: 13,
                           ),
                           prefixIcon: const Icon(
@@ -318,18 +326,26 @@ class _CustomerHomeState extends State<CustomerHome> {
 
                   // Glass Filter button
                   GlassContainer(
-                    width: 50,
+                    width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 20,
-                    opacity: _filter.isActive ? 0.45 : 0.35,
-                    color: _filter.isActive ? const Color(0xFF00E676) : const Color(0xFF0B132B),
-                    borderColor: _filter.isActive ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.25),
+                    blur: 16,
+                    opacity: _filter.isActive ? 0.9 : (isDark ? 0.35 : 0.85),
+                    color: _filter.isActive
+                        ? const Color(0xFF00E676)
+                        : (isDark ? const Color(0xFF0B132B) : Colors.white),
+                    borderColor: _filter.isActive
+                        ? const Color(0xFF00E676)
+                        : (isDark
+                            ? Colors.white.withValues(alpha: 0.25)
+                            : Colors.black.withValues(alpha: 0.08)),
                     glowColor: _filter.isActive ? const Color(0xFF00E676) : null,
                     onTap: _openFilterSheet,
                     child: Icon(
                       Icons.tune_rounded,
-                      color: _filter.isActive ? const Color(0xFF0B132B) : Colors.white,
+                      color: _filter.isActive
+                          ? const Color(0xFF0B132B)
+                          : (isDark ? Colors.white : const Color(0xFF0F172A)),
                       size: 20,
                     ),
                   ),
@@ -338,12 +354,12 @@ class _CustomerHomeState extends State<CustomerHome> {
 
                   // Glass My Bookings button
                   GlassContainer(
-                    width: 50,
+                    width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 20,
-                    opacity: 0.35,
-                    color: const Color(0xFF0B132B),
+                    blur: 16,
+                    opacity: isDark ? 0.35 : 0.85,
+                    color: isDark ? const Color(0xFF0B132B) : Colors.white,
                     onTap: () => Navigator.pushNamed(context, '/my-bookings'),
                     child: const Icon(
                       Icons.calendar_month_rounded,
@@ -359,17 +375,17 @@ class _CustomerHomeState extends State<CustomerHome> {
                     width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 20,
-                    opacity: 0.35,
-                    color: const Color(0xFF0B132B),
+                    blur: 16,
+                    opacity: isDark ? 0.35 : 0.85,
+                    color: isDark ? const Color(0xFF0B132B) : Colors.white,
                     onTap: () => ThemeService.toggleTheme(),
                     child: Icon(
-                      ThemeService.isDark(context)
+                      isDark
                           ? Icons.wb_sunny_rounded
                           : Icons.nightlight_round,
-                      color: ThemeService.isDark(context)
+                      color: isDark
                           ? const Color(0xFFFFB300)
-                          : const Color(0xFF00E5FF),
+                          : const Color(0xFF3395FF),
                       size: 20,
                     ),
                   ),
@@ -381,13 +397,13 @@ class _CustomerHomeState extends State<CustomerHome> {
                     width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 20,
-                    opacity: 0.35,
-                    color: const Color(0xFF0B132B),
+                    blur: 16,
+                    opacity: isDark ? 0.35 : 0.85,
+                    color: isDark ? const Color(0xFF0B132B) : Colors.white,
                     onTap: _logout,
-                    child: const Icon(
+                    child: Icon(
                       Icons.logout_rounded,
-                      color: Colors.white70,
+                      color: isDark ? Colors.white70 : const Color(0xFF64748B),
                       size: 20,
                     ),
                   ),
@@ -423,9 +439,9 @@ class _CustomerHomeState extends State<CustomerHome> {
           width: 48,
           height: 48,
           borderRadius: BorderRadius.circular(16),
-          blur: 20,
-          opacity: 0.4,
-          color: const Color(0xFF0B132B),
+          blur: 16,
+          opacity: isDark ? 0.4 : 0.9,
+          color: isDark ? const Color(0xFF0B132B) : Colors.white,
           glowColor: const Color(0xFF00E676),
           onTap: _goToMyLocation,
           child: const Center(
@@ -438,22 +454,28 @@ class _CustomerHomeState extends State<CustomerHome> {
   }
 
   Widget _buildBottomStrip() {
+    final isDark = ThemeService.isDark(context);
+
     if (_filteredChargers.isEmpty) {
       return GlassContainer(
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(18),
         borderRadius: BorderRadius.circular(20),
-        blur: 20,
-        opacity: 0.35,
-        color: const Color(0xFF0B132B),
+        blur: 16,
+        opacity: isDark ? 0.35 : 0.9,
+        color: isDark ? const Color(0xFF0B132B) : Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off_rounded, color: Colors.white.withValues(alpha: 0.5)),
+            Icon(Icons.search_off_rounded,
+                color: isDark ? Colors.white54 : Colors.black45),
             const SizedBox(width: 10),
             Text(
               'No chargers match your filters',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              style: TextStyle(
+                color: isDark ? Colors.white70 : const Color(0xFF475569),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -469,6 +491,7 @@ class _CustomerHomeState extends State<CustomerHome> {
           // Smart Feature Glass Pill Action Bar
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
@@ -525,14 +548,14 @@ class _CustomerHomeState extends State<CustomerHome> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               borderRadius: BorderRadius.circular(14),
               blur: 16,
-              opacity: 0.35,
-              color: const Color(0xFF0B132B),
+              opacity: isDark ? 0.35 : 0.9,
+              color: isDark ? const Color(0xFF0B132B) : Colors.white,
               child: Text(
                 '${_filteredChargers.length} station${_filteredChargers.length == 1 ? '' : 's'} nearby',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
             ),
@@ -542,6 +565,7 @@ class _CustomerHomeState extends State<CustomerHome> {
             height: 180,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(16, 0, 4, 8),
               itemCount: _filteredChargers.length,
               itemBuilder: (_, i) => ChargerCard(
@@ -574,13 +598,15 @@ class _CustomerHomeState extends State<CustomerHome> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final isDark = ThemeService.isDark(context);
+
     return GlassContainer(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       borderRadius: BorderRadius.circular(20),
-      blur: 20,
-      opacity: 0.35,
-      color: const Color(0xFF0B132B),
-      borderColor: color.withValues(alpha: 0.4),
+      blur: 16,
+      opacity: isDark ? 0.35 : 0.9,
+      color: isDark ? const Color(0xFF0B132B) : Colors.white,
+      borderColor: color.withValues(alpha: isDark ? 0.4 : 0.6),
       onTap: onTap,
       child: Row(
         mainAxisSize: MainAxisSize.min,

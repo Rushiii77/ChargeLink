@@ -25,23 +25,34 @@ class _OwnerHomeState extends State<OwnerHome> {
   final ChargerService _chargerService = ChargerService();
 
   Future<void> _logout() async {
+    final isDark = ThemeService.isDark(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0B132B),
+        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
         ),
-        title: const Text("Log Out", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          "Log Out",
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Text(
           "Are you sure you want to sign out from ChargeLink Host Hub?",
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
+          style: TextStyle(
+            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF475569),
+            fontSize: 13,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white60)),
+            child: Text("Cancel", style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -66,10 +77,16 @@ class _OwnerHomeState extends State<OwnerHome> {
   @override
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
+    final isDark = ThemeService.isDark(context);
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("Please sign in", style: TextStyle(color: Colors.white))),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            "Please sign in",
+            style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A)),
+          ),
+        ),
       );
     }
 
@@ -106,6 +123,7 @@ class _OwnerHomeState extends State<OwnerHome> {
 
                 return SafeArea(
                   child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +139,8 @@ class _OwnerHomeState extends State<OwnerHome> {
                                   height: 46,
                                   borderRadius: BorderRadius.circular(14),
                                   blur: 16,
-                                  opacity: 0.15,
+                                  opacity: isDark ? 0.15 : 0.85,
+                                  color: isDark ? Colors.white : Colors.white,
                                   glowColor: const Color(0xFF00E676),
                                   child: const Center(
                                     child: Icon(
@@ -139,15 +158,15 @@ class _OwnerHomeState extends State<OwnerHome> {
                                       "Welcome back,",
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.white.withValues(alpha: 0.65),
+                                        color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
                                       ),
                                     ),
-                                    const Text(
+                                    Text(
                                       "Station Host Hub",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                                       ),
                                     ),
                                   ],
@@ -163,15 +182,16 @@ class _OwnerHomeState extends State<OwnerHome> {
                                   height: 44,
                                   borderRadius: BorderRadius.circular(14),
                                   blur: 16,
-                                  opacity: 0.1,
+                                  opacity: isDark ? 0.1 : 0.85,
+                                  color: isDark ? Colors.white : Colors.white,
                                   onTap: () => ThemeService.toggleTheme(),
                                   child: Icon(
-                                    ThemeService.isDark(context)
+                                    isDark
                                         ? Icons.wb_sunny_rounded
                                         : Icons.nightlight_round,
-                                    color: ThemeService.isDark(context)
+                                    color: isDark
                                         ? const Color(0xFFFFB300)
-                                        : const Color(0xFF00E5FF),
+                                        : const Color(0xFF3395FF),
                                     size: 18,
                                   ),
                                 ),
@@ -181,11 +201,12 @@ class _OwnerHomeState extends State<OwnerHome> {
                                   height: 44,
                                   borderRadius: BorderRadius.circular(14),
                                   blur: 16,
-                                  opacity: 0.1,
+                                  opacity: isDark ? 0.1 : 0.85,
+                                  color: isDark ? Colors.white : Colors.white,
                                   onTap: _logout,
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.logout_rounded,
-                                    color: Colors.white70,
+                                    color: isDark ? Colors.white70 : const Color(0xFF64748B),
                                     size: 18,
                                   ),
                                 ),
@@ -200,8 +221,9 @@ class _OwnerHomeState extends State<OwnerHome> {
                         GlassContainer(
                           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                           borderRadius: BorderRadius.circular(24),
-                          blur: 24,
-                          opacity: 0.14,
+                          blur: 20,
+                          opacity: isDark ? 0.14 : 0.9,
+                          color: isDark ? Colors.white : Colors.white,
                           glowColor: const Color(0xFF00E676),
                           glowSpread: 2,
                           child: Row(
@@ -212,28 +234,31 @@ class _OwnerHomeState extends State<OwnerHome> {
                                 "My Chargers",
                                 Icons.ev_station_rounded,
                                 const Color(0xFF00E676),
+                                isDark,
                               ),
                               Container(
                                 width: 1,
                                 height: 40,
-                                color: Colors.white.withValues(alpha: 0.15),
+                                color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08),
                               ),
                               _buildStatItem(
                                 "$todayBookings",
                                 "Today's Slots",
                                 Icons.bolt_rounded,
                                 const Color(0xFF00E5FF),
+                                isDark,
                               ),
                               Container(
                                 width: 1,
                                 height: 40,
-                                color: Colors.white.withValues(alpha: 0.15),
+                                color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08),
                               ),
                               _buildStatItem(
                                 "₹${totalRevenue.toStringAsFixed(0)}",
                                 "Total Revenue",
                                 Icons.account_balance_wallet_rounded,
                                 const Color(0xFFFFB300),
+                                isDark,
                               ),
                             ],
                           ),
@@ -242,12 +267,12 @@ class _OwnerHomeState extends State<OwnerHome> {
                         const SizedBox(height: 28),
 
                         // Section Title
-                        const Text(
+                        Text(
                           "Station Operations",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -260,6 +285,7 @@ class _OwnerHomeState extends State<OwnerHome> {
                           subtitle: "Publish a high-speed EV charging point to the map",
                           icon: Icons.add_circle_outline_rounded,
                           color: const Color(0xFF00E676),
+                          isDark: isDark,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -275,6 +301,7 @@ class _OwnerHomeState extends State<OwnerHome> {
                           subtitle: "View pricing, power specs, and toggle availability switch",
                           icon: Icons.electrical_services_rounded,
                           color: const Color(0xFF00E5FF),
+                          isDark: isDark,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -290,6 +317,7 @@ class _OwnerHomeState extends State<OwnerHome> {
                           subtitle: "Verify driver 4-digit PIN and activate charging sessions",
                           icon: Icons.calendar_month_rounded,
                           color: const Color(0xFFFFB300),
+                          isDark: isDark,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -305,6 +333,7 @@ class _OwnerHomeState extends State<OwnerHome> {
                           subtitle: "Real-time revenue, kWh power dispensed, and driver ratings",
                           icon: Icons.insights_rounded,
                           color: const Color(0xFF8B5CF6),
+                          isDark: isDark,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -320,6 +349,7 @@ class _OwnerHomeState extends State<OwnerHome> {
                           subtitle: "Manage business profile, contact number, and payouts",
                           icon: Icons.store_rounded,
                           color: const Color(0xFF10B981),
+                          isDark: isDark,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -341,17 +371,17 @@ class _OwnerHomeState extends State<OwnerHome> {
     );
   }
 
-  Widget _buildStatItem(String value, String label, IconData icon, Color color) {
+  Widget _buildStatItem(String value, String label, IconData icon, Color color, bool isDark) {
     return Column(
       children: [
         Icon(icon, size: 22, color: color),
         const SizedBox(height: 6),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
         ),
         const SizedBox(height: 2),
@@ -360,7 +390,7 @@ class _OwnerHomeState extends State<OwnerHome> {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: Colors.white.withValues(alpha: 0.65),
+            color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
           ),
         ),
       ],
@@ -372,13 +402,15 @@ class _OwnerHomeState extends State<OwnerHome> {
     required String subtitle,
     required IconData icon,
     required Color color,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
     return GlassContainer(
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(22),
-      blur: 20,
-      opacity: 0.1,
+      blur: 16,
+      opacity: isDark ? 0.1 : 0.85,
+      color: isDark ? Colors.white : Colors.white,
       onTap: onTap,
       child: Row(
         children: [
@@ -403,10 +435,10 @@ class _OwnerHomeState extends State<OwnerHome> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -414,7 +446,7 @@ class _OwnerHomeState extends State<OwnerHome> {
                   subtitle,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.65),
+                    color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
                     height: 1.3,
                   ),
                 ),
@@ -424,7 +456,7 @@ class _OwnerHomeState extends State<OwnerHome> {
 
           Icon(
             Icons.chevron_right_rounded,
-            color: Colors.white.withValues(alpha: 0.4),
+            color: isDark ? Colors.white.withValues(alpha: 0.4) : const Color(0xFF94A3B8),
             size: 22,
           ),
         ],

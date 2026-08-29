@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../models/charger_model.dart';
+import '../../../widgets/glass/glass_background.dart';
+import '../../../widgets/glass/glass_button.dart';
+import '../../../widgets/glass/glass_container.dart';
 
 class ActiveSessionScreen extends StatefulWidget {
   final ChargerModel? charger;
@@ -52,7 +55,6 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
       if (!mounted) return;
       setState(() {
         _elapsedSeconds++;
-        // Simulate energy progression
         if (_currentBattery < _targetBattery) {
           _currentBattery += 0.05;
           _energyDeliveredKwh += 0.02;
@@ -79,17 +81,24 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text("Stop Charging?"),
-        content: const Text("Your battery will stop charging and final receipt will be generated."),
+        backgroundColor: const Color(0xFF0B132B),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+        ),
+        title: const Text("Stop Charging?", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text(
+          "Your charging session will be finalized and a digital settlement receipt will be generated.",
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Continue Charging", style: TextStyle(color: Color(0xFF6B7280))),
+            child: const Text("Continue Charging", style: TextStyle(color: Colors.white60)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade400,
+              backgroundColor: Colors.redAccent.shade400,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
@@ -108,40 +117,43 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
     showModalBottomSheet(
       context: context,
       isDismissible: false,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (ctx) => Padding(
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => GlassContainer(
         padding: const EdgeInsets.all(28),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        blur: 28,
+        opacity: 0.45,
+        color: const Color(0xFF0B132B),
+        borderColor: Colors.white.withValues(alpha: 0.2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 64,
               height: 64,
-              decoration: const BoxDecoration(
-                color: Color(0xFFE8FFF0),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00E676).withValues(alpha: 0.15),
                 shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF00E676), width: 1.5),
               ),
-              child: const Icon(Icons.check_rounded, color: Color(0xFF00C853), size: 40),
+              child: const Icon(Icons.check_rounded, color: Color(0xFF00E676), size: 40),
             ),
             const SizedBox(height: 16),
             const Text(
               "Charging Session Complete",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               _activeCharger.name,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+              style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 20),
-            Container(
+            GlassContainer(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F7FA),
-                borderRadius: BorderRadius.circular(18),
-              ),
+              borderRadius: BorderRadius.circular(20),
+              blur: 16,
+              opacity: 0.1,
               child: Column(
                 children: [
                   _receiptRow("Duration", _formatTime(_elapsedSeconds)),
@@ -149,14 +161,14 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
                   _receiptRow("Energy Delivered", "${_energyDeliveredKwh.toStringAsFixed(2)} kWh"),
                   const SizedBox(height: 8),
                   _receiptRow("Average Power", "${_activeCharger.powerKw.toInt()} kW"),
-                  const Divider(height: 20, color: Color(0xFFE5E7EB)),
+                  Divider(height: 24, color: Colors.white.withValues(alpha: 0.15)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Total Paid", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                      const Text("Total Settled", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
                       Text(
                         "₹${_currentCost.toStringAsFixed(0)}",
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF00C853)),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF00E676)),
                       ),
                     ],
                   ),
@@ -164,20 +176,12 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
               ),
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00C853),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
-                ),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.pop(context);
-                },
-                child: const Text("Done", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
+            GlassButton(
+              text: "DONE",
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.pop(context);
+              },
             ),
           ],
         ),
@@ -189,8 +193,8 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280))),
-        Text(val, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
+        Text(label, style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.65))),
+        Text(val, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
       ],
     );
   }
@@ -200,188 +204,193 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
     final progress = (_currentBattery / 100.0).clamp(0.0, 1.0);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E), // Dark ambient charging theme
-      appBar: AppBar(
-        title: const Text(
-          "Active Charging Session",
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        child: Column(
-          children: [
-            // Station Pill Banner
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.ev_station_rounded, color: Color(0xFF00C853), size: 18),
-                  const SizedBox(width: 8),
-                  Text(
-                    _activeCharger.name,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "(${_activeCharger.powerLabel})",
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 36),
-
-            // Animated Charging Gauge
-            Center(
-              child: SizedBox(
-                width: 220,
-                height: 220,
-                child: Stack(
-                  alignment: Alignment.center,
+      body: GlassBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Column(
+              children: [
+                // Top App Bar
+                Row(
                   children: [
-                    // Glow effect
-                    AnimatedBuilder(
-                      animation: _pulseController,
-                      builder: (ctx, child) {
-                        return Container(
-                          width: 190 + (_pulseController.value * 20),
-                          height: 190 + (_pulseController.value * 20),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFF00C853).withValues(alpha: 0.08 * _pulseController.value),
-                          ),
-                        );
-                      },
-                    ),
-
-                    // Circular Progress Track
-                    SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: CircularProgressIndicator(
-                        value: progress,
-                        strokeWidth: 14,
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00C853)),
-                        strokeCap: StrokeCap.round,
+                    GlassContainer(
+                      width: 44,
+                      height: 44,
+                      borderRadius: BorderRadius.circular(14),
+                      blur: 16,
+                      opacity: 0.1,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
-
-                    // Inside Info
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.bolt_rounded, size: 36, color: Color(0xFF00C853)),
-                        const SizedBox(height: 2),
-                        Text(
-                          "${_currentBattery.toInt()}%",
-                          style: const TextStyle(
-                            fontSize: 44,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          "Target ${_targetBattery.toInt()}%",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: 14),
+                    const Text(
+                      "Live Charging Telemetry",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 36),
+                const SizedBox(height: 20),
 
-            // Live Metrics 2x2 Grid
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-              ),
-              child: Column(
-                children: [
-                  Row(
+                // Station Pill Banner
+                GlassContainer(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  borderRadius: BorderRadius.circular(20),
+                  blur: 16,
+                  opacity: 0.12,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildLiveTile(
-                        icon: Icons.electric_bolt_rounded,
-                        color: const Color(0xFFF59E0B),
-                        label: "Energy Delivered",
-                        value: "${_energyDeliveredKwh.toStringAsFixed(2)} kWh",
+                      const Icon(Icons.ev_station_rounded, color: Color(0xFF00E676), size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        _activeCharger.name,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                       ),
-                      _buildLiveTile(
-                        icon: Icons.speed_rounded,
-                        color: const Color(0xFF3B82F6),
-                        label: "Charging Speed",
-                        value: "${_activeCharger.powerKw.toInt()} kW",
+                      const SizedBox(width: 8),
+                      Text(
+                        "(${_activeCharger.powerLabel})",
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Row(
+                ),
+
+                const SizedBox(height: 36),
+
+                // Animated Charging Gauge
+                RepaintBoundary(
+                  child: SizedBox(
+                    width: 220,
+                    height: 220,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Pulse animation glow
+                        AnimatedBuilder(
+                          animation: _pulseController,
+                          builder: (ctx, child) {
+                            return Container(
+                              width: 190 + (_pulseController.value * 20),
+                              height: 190 + (_pulseController.value * 20),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(0xFF00E676).withValues(alpha: 0.12 * _pulseController.value),
+                              ),
+                            );
+                          },
+                        ),
+
+                        // Circular Progress Track
+                        SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: CircularProgressIndicator(
+                            value: progress,
+                            strokeWidth: 12,
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00E676)),
+                            strokeCap: StrokeCap.round,
+                          ),
+                        ),
+
+                        // Inside Info
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.bolt_rounded, size: 36, color: Color(0xFF00E676)),
+                            const SizedBox(height: 2),
+                            Text(
+                              "${_currentBattery.toInt()}%",
+                              style: const TextStyle(
+                                fontSize: 42,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              "Target ${_targetBattery.toInt()}%",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white.withValues(alpha: 0.65),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 36),
+
+                // Live Metrics 2x2 Grid
+                GlassContainer(
+                  padding: const EdgeInsets.all(20),
+                  borderRadius: BorderRadius.circular(24),
+                  blur: 20,
+                  opacity: 0.12,
+                  child: Column(
                     children: [
-                      _buildLiveTile(
-                        icon: Icons.timer_rounded,
-                        color: const Color(0xFF00C853),
-                        label: "Session Time",
-                        value: _formatTime(_elapsedSeconds),
+                      Row(
+                        children: [
+                          _buildLiveTile(
+                            icon: Icons.electric_bolt_rounded,
+                            color: const Color(0xFFFFB300),
+                            label: "Energy Delivered",
+                            value: "${_energyDeliveredKwh.toStringAsFixed(2)} kWh",
+                          ),
+                          _buildLiveTile(
+                            icon: Icons.speed_rounded,
+                            color: const Color(0xFF00E5FF),
+                            label: "Charging Speed",
+                            value: "${_activeCharger.powerKw.toInt()} kW",
+                          ),
+                        ],
                       ),
-                      _buildLiveTile(
-                        icon: Icons.currency_rupee_rounded,
-                        color: const Color(0xFFE11D48),
-                        label: "Running Total",
-                        value: "₹${_currentCost.toStringAsFixed(0)}",
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          _buildLiveTile(
+                            icon: Icons.timer_rounded,
+                            color: const Color(0xFF00E676),
+                            label: "Session Time",
+                            value: _formatTime(_elapsedSeconds),
+                          ),
+                          _buildLiveTile(
+                            icon: Icons.currency_rupee_rounded,
+                            color: const Color(0xFFF43F5E),
+                            label: "Running Total",
+                            value: "₹${_currentCost.toStringAsFixed(0)}",
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 36),
-
-            // Stop Charging CTA Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade500,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
                 ),
-                icon: const Icon(Icons.power_settings_new_rounded),
-                label: const Text(
-                  "STOP CHARGING & SETTLE",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 0.8),
-                ),
-                onPressed: _stopCharging,
-              ),
-            ),
 
-            const SizedBox(height: 20),
-          ],
+                const SizedBox(height: 32),
+
+                // Stop Charging CTA Button
+                GlassButton(
+                  text: "STOP CHARGING & SETTLE",
+                  color: Colors.redAccent.shade400,
+                  icon: Icons.power_settings_new_rounded,
+                  onPressed: _stopCharging,
+                ),
+
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -403,7 +412,7 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
               const SizedBox(width: 6),
               Text(
                 label,
-                style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.6)),
+                style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.65)),
               ),
             ],
           ),
@@ -421,4 +430,3 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
     );
   }
 }
-
