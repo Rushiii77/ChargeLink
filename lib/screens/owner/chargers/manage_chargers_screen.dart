@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
+import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
 import '../add_charger/add_charger_screen.dart';
 
@@ -44,23 +46,33 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
   }
 
   Future<void> _deleteCharger(ChargerModel charger) async {
+    final isDark = ThemeService.isDark(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0B132B),
+        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
         ),
-        title: const Text("Delete Station", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          "Delete Station",
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Text(
-          "Are you sure you want to remove '${charger.name}' from the quantum grid?",
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+          "Are you sure you want to remove '${charger.name}' from the charging network?",
+          style: TextStyle(
+            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF475569),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white60)),
+            child: Text("Cancel", style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -92,10 +104,16 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
   @override
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
+    final isDark = ThemeService.isDark(context);
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("Please login to manage chargers", style: TextStyle(color: Colors.white))),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            "Please login to manage chargers",
+            style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A)),
+          ),
+        ),
       );
     }
 
@@ -104,37 +122,40 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // Top Bar
+              // App Bar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
                   children: [
                     GlassContainer(
+                      tier: GlassTier.tertiary,
                       width: 44,
                       height: 44,
                       borderRadius: BorderRadius.circular(14),
-                      blur: 16,
-                      opacity: 0.1,
                       child: IconButton(
                         padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          size: 18,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Text(
+                    Text(
                       "My Charging Stations",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              // Chargers Stream
+              // Charger Stream
               Expanded(
                 child: StreamBuilder<List<ChargerModel>>(
                   stream: _chargerService.streamOwnerChargers(user.uid),
@@ -154,12 +175,12 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              GlassContainer(
-                                width: 88,
-                                height: 88,
-                                borderRadius: BorderRadius.circular(28),
-                                blur: 16,
-                                opacity: 0.1,
+                              Container(
+                                padding: const EdgeInsets.all(22),
+                                decoration: BoxDecoration(
+                                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                  shape: BoxShape.circle,
+                                ),
                                 child: const Icon(
                                   Icons.ev_station_rounded,
                                   size: 48,
@@ -167,19 +188,36 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text(
-                                "No Stations Listed",
+                              Text(
+                                "No Charging Stations Listed",
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                                 ),
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                "Publish your EV charger to start accepting driver bookings and earning revenue.",
+                                "Start earning by registering your EV charger onto the live network.",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.65), height: 1.4),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              GlassButton(
+                                text: "ADD FIRST CHARGER",
+                                width: 220,
+                                icon: Icons.add_rounded,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const AddChargerScreen(),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -188,12 +226,10 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                     }
 
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       itemCount: chargers.length,
-                      itemBuilder: (ctx, index) {
-                        final charger = chargers[index];
-                        return _buildChargerHostCard(charger);
-                      },
+                      itemBuilder: (ctx, index) => _buildOwnerChargerCard(chargers[index], isDark),
                     );
                   },
                 ),
@@ -202,123 +238,125 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
           ),
         ),
       ),
-      floatingActionButton: GlassContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        borderRadius: BorderRadius.circular(26),
-        blur: 20,
-        opacity: 0.8,
-        color: const Color(0xFF00E676),
-        borderColor: Colors.white.withValues(alpha: 0.4),
-        glowColor: const Color(0xFF00E676),
-        glowSpread: 2,
-        onTap: () {
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF00E676),
+        foregroundColor: const Color(0xFF0B132B),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text("ADD CHARGER", style: TextStyle(fontWeight: FontWeight.bold)),
+        onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const AddChargerScreen()),
           );
         },
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add_rounded, color: Color(0xFF0B132B), size: 22),
-            SizedBox(width: 8),
-            Text(
-              "Add Charger",
-              style: TextStyle(color: Color(0xFF0B132B), fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-          ],
-        ),
       ),
     );
   }
 
-  Widget _buildChargerHostCard(ChargerModel charger) {
+  Widget _buildOwnerChargerCard(ChargerModel charger, bool isDark) {
     return GlassContainer(
+      tier: GlassTier.secondary,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
       borderRadius: BorderRadius.circular(24),
-      blur: 20,
-      opacity: 0.12,
+      borderColor: charger.isAvailable
+          ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.4 : 0.6)
+          : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  charger.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: charger.isAvailable
+                      ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15)
+                      : Colors.redAccent.withValues(alpha: isDark ? 0.2 : 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.ev_station_rounded,
+                  color: charger.isAvailable
+                      ? const Color(0xFF00E676)
+                      : Colors.redAccent.shade100,
+                  size: 24,
                 ),
               ),
-              Switch.adaptive(
-                value: charger.isAvailable,
-                activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.5),
-                activeThumbColor: const Color(0xFF00E676),
-                onChanged: (val) => _toggleAvailability(charger, val),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      charger.name,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      charger.address,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.delete_outline_rounded, color: Colors.redAccent.shade200, size: 20),
+                onPressed: () => _deleteCharger(charger),
               ),
             ],
           ),
 
-          const SizedBox(height: 2),
-
-          Text(
-            charger.address,
-            style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.65)),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 14),
+          Divider(
+            height: 1,
+            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
           ),
-
-          const SizedBox(height: 12),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.1)),
           const SizedBox(height: 12),
 
-          // Specs badges
+          // Specs Row
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.3)),
-                ),
-                child: Text(
-                  charger.powerLabel,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF00E676),
-                  ),
+              Text(
+                "${charger.powerKw.toInt()} kW ${charger.chargerType}",
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.3)),
+                  color: const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.15 : 0.1),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   charger.connectorType,
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF00E5FF),
+                    color: Color(0xFF00B4D8),
                   ),
                 ),
               ),
               const Spacer(),
               Text(
                 "₹${charger.pricePerKwh.toStringAsFixed(0)} / kWh",
-                style: const TextStyle(
-                  fontSize: 15,
+                style: TextStyle(
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
                 ),
               ),
             ],
@@ -326,31 +364,45 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
 
           const SizedBox(height: 12),
 
-          // Rating + Delete
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.star_rounded, size: 16, color: Color(0xFFFFB300)),
-                  const SizedBox(width: 4),
-                  Text(
-                    charger.rating.toStringAsFixed(1),
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "(${charger.totalReviews} reviews)",
-                    style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.6)),
-                  ),
-                ],
-              ),
-              IconButton(
-                icon: Icon(Icons.delete_outline_rounded, color: Colors.redAccent.shade200, size: 20),
-                tooltip: "Delete Station",
-                onPressed: () => _deleteCharger(charger),
-              ),
-            ],
+          // Live Availability Switch
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: charger.isAvailable ? const Color(0xFF00E676) : Colors.redAccent,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      charger.isAvailable ? "Live & Ready for Bookings" : "Offline (Maintenance)",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white70 : const Color(0xFF475569),
+                      ),
+                    ),
+                  ],
+                ),
+                Switch.adaptive(
+                  value: charger.isAvailable,
+                  activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.5),
+                  activeThumbColor: const Color(0xFF00E676),
+                  onChanged: (val) => _toggleAvailability(charger, val),
+                ),
+              ],
+            ),
           ),
         ],
       ),

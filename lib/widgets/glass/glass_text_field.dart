@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../services/theme_service.dart';
 
 class GlassTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -33,17 +34,23 @@ class GlassTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.white.withValues(alpha: 0.85),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.18),
-              width: 1.2,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.16)
+                  : Colors.black.withValues(alpha: 0.08),
+              width: 1.0,
             ),
           ),
           child: TextFormField(
@@ -55,8 +62,8 @@ class GlassTextField extends StatelessWidget {
             validator: validator,
             readOnly: readOnly,
             onTap: onTap,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -67,11 +74,11 @@ class GlassTextField extends StatelessWidget {
               labelText: labelText,
               hintText: hintText,
               labelStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
                 fontSize: 14,
               ),
               hintStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.4),
+                color: isDark ? Colors.white.withValues(alpha: 0.4) : const Color(0xFF94A3B8),
                 fontSize: 13,
               ),
               prefixIcon: prefixIcon != null
@@ -109,4 +116,3 @@ class GlassTextField extends StatelessWidget {
     );
   }
 }
-

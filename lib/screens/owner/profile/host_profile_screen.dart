@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
@@ -46,11 +47,13 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
+    final isDark = ThemeService.isDark(context);
 
     return Scaffold(
       body: GlassBackground(
         child: SafeArea(
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,24 +62,27 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                 Row(
                   children: [
                     GlassContainer(
+                      tier: GlassTier.tertiary,
                       width: 44,
                       height: 44,
                       borderRadius: BorderRadius.circular(14),
-                      blur: 16,
-                      opacity: 0.1,
                       child: IconButton(
                         padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          size: 18,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Text(
+                    Text(
                       "Station Host Profile",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                   ],
@@ -86,29 +92,24 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
 
                 // Host Hero Card
                 GlassContainer(
+                  tier: GlassTier.secondary,
                   padding: const EdgeInsets.all(22),
                   borderRadius: BorderRadius.circular(28),
-                  blur: 20,
-                  opacity: 0.14,
                   child: Row(
                     children: [
                       Container(
                         width: 64,
                         height: 64,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [Color(0xFF00E676), Color(0xFF00E5FF)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF00E676).withValues(alpha: 0.35),
-                              blurRadius: 14,
-                            ),
-                          ],
                         ),
                         child: const Center(
-                          child: Icon(Icons.person_rounded, size: 36, color: Color(0xFF0B132B)),
+                          child: Icon(Icons.storefront_rounded, color: Color(0xFF0B132B), size: 34),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -117,32 +118,34 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              user?.displayName ?? "Station Host Partner",
-                              style: const TextStyle(
-                                fontSize: 17,
+                              user?.displayName ?? "Verified Host Partner",
+                              style: TextStyle(
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               user?.email ?? "host@chargelink.com",
-                              style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.65)),
-                            ),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF00E676).withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.4)),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
                               ),
-                              child: const Text(
-                                "✓ Verified Host Operator",
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                "● Station Host Tier 1",
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF00E676),
+                                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
                                 ),
                               ),
                             ),
@@ -155,37 +158,40 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
 
                 const SizedBox(height: 24),
 
-                // Settings Form
+                // Form Details
+                Text(
+                  "Business & Payout Details",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
                 GlassContainer(
-                  padding: const EdgeInsets.all(20),
+                  tier: GlassTier.secondary,
+                  padding: const EdgeInsets.all(18),
                   borderRadius: BorderRadius.circular(24),
-                  blur: 20,
-                  opacity: 0.12,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Business & Payout Information",
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                      const SizedBox(height: 16),
                       GlassTextField(
                         controller: _businessNameController,
-                        labelText: "Business / Entity Name",
+                        labelText: "Station Commercial Name",
                         prefixIcon: Icons.business_rounded,
                       ),
                       const SizedBox(height: 14),
                       GlassTextField(
                         controller: _phoneController,
-                        labelText: "Support Phone Number",
-                        prefixIcon: Icons.phone_outlined,
+                        labelText: "Host Contact Number",
                         keyboardType: TextInputType.phone,
+                        prefixIcon: Icons.phone_rounded,
                       ),
                       const SizedBox(height: 14),
                       GlassTextField(
                         controller: _upiController,
-                        labelText: "Payout UPI ID / VPA",
-                        prefixIcon: Icons.account_balance_wallet_outlined,
+                        labelText: "Payout UPI VPA (Direct Bank Deposit)",
+                        prefixIcon: Icons.account_balance_rounded,
                       ),
                     ],
                   ),
@@ -194,9 +200,9 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                 const SizedBox(height: 28),
 
                 GlassButton(
-                  text: "SAVE PROFILE & PAYOUT SETTINGS",
+                  text: "SAVE PROFILE CHANGES",
                   isLoading: _isSaving,
-                  icon: Icons.save_rounded,
+                  icon: Icons.check_circle_rounded,
                   onPressed: _saveProfile,
                 ),
 

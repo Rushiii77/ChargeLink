@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../services/theme_service.dart';
 import '../../widgets/glass/glass_background.dart';
 import '../../widgets/glass/glass_button.dart';
 import '../../widgets/glass/glass_container.dart';
@@ -55,6 +56,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return Scaffold(
       body: GlassBackground(
         child: SafeArea(
@@ -67,14 +70,13 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
                 // Step Pill
                 GlassContainer(
+                  tier: GlassTier.tertiary,
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   borderRadius: BorderRadius.circular(20),
-                  blur: 16,
-                  opacity: 0.15,
-                  child: const Text(
+                  child: Text(
                     "STEP 2 OF 2",
                     style: TextStyle(
-                      color: Color(0xFF00E676),
+                      color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.1,
@@ -84,12 +86,12 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
                 const SizedBox(height: 18),
 
-                const Text(
+                Text(
                   "Choose Your Role",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -99,47 +101,44 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 Text(
                   "Select how you plan to use ChargeLink. You can switch or add roles anytime in settings.",
                   style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 14,
+                    color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
                     height: 1.4,
                   ),
                 ),
 
-                const SizedBox(height: 36),
+                const SizedBox(height: 32),
 
-                // Role Option 1: EV Driver
+                // Role Card 1: EV Driver
                 _buildRoleOption(
-                  title: "EV Owner & Driver",
-                  badge: "Recommended for Drivers",
-                  description:
-                      "Discover high-speed chargers, check live availability, AI match, and reserve slots seamlessly.",
+                  roleValue: 'customer',
+                  title: 'EV Driver / Customer',
+                  description: 'Discover nearby chargers, check live occupancy, and reserve charging slots seamlessly.',
                   icon: Icons.electric_car_rounded,
-                  value: "customer",
-                  accentColor: const Color(0xFF00E676),
+                  iconColor: const Color(0xFF00E676),
+                  isDark: isDark,
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-                // Role Option 2: Station Host
+                // Role Card 2: Station Host
                 _buildRoleOption(
-                  title: "Charging Station Host",
-                  badge: "Monetize Your Charger",
-                  description:
-                      "List your private or commercial charger, manage bookings, verify driver PINs, and earn revenue.",
+                  roleValue: 'owner',
+                  title: 'Station Host / Owner',
+                  description: 'List your private or commercial charging station, manage pricing, and earn revenue.',
                   icon: Icons.ev_station_rounded,
-                  value: "owner",
-                  accentColor: const Color(0xFF00E5FF),
+                  iconColor: const Color(0xFF00E5FF),
+                  isDark: isDark,
                 ),
 
                 const Spacer(),
 
-                // Continue Button
+                // Continue CTA Button
                 GlassButton(
-                  text: "CONTINUE",
+                  text: selectedRole != null ? "GET STARTED" : "SELECT A ROLE",
                   isLoading: _isLoading,
                   icon: Icons.arrow_forward_rounded,
-                  color: selectedRole != null ? const Color(0xFF00E676) : null,
-                  onPressed: selectedRole == null ? null : _handleContinue,
+                  onPressed: selectedRole != null ? _handleContinue : null,
                 ),
 
                 const SizedBox(height: 10),
@@ -152,108 +151,85 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   }
 
   Widget _buildRoleOption({
+    required String roleValue,
     required String title,
-    required String badge,
     required String description,
     required IconData icon,
-    required String value,
-    required Color accentColor,
+    required Color iconColor,
+    required bool isDark,
   }) {
-    final bool isSelected = selectedRole == value;
+    final isSelected = selectedRole == roleValue;
 
     return GlassContainer(
+      tier: GlassTier.secondary,
       padding: const EdgeInsets.all(20),
       borderRadius: BorderRadius.circular(24),
-      blur: 20,
-      opacity: isSelected ? 0.22 : 0.08,
-      borderColor: isSelected ? accentColor : Colors.white.withValues(alpha: 0.15),
+      borderColor: isSelected
+          ? const Color(0xFF00E676)
+          : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
       borderWidth: isSelected ? 2.0 : 1.0,
-      glowColor: isSelected ? accentColor : null,
+      glowColor: isSelected ? const Color(0xFF00E676) : null,
       glowSpread: isSelected ? 2 : 0,
-      onTap: () => setState(() => selectedRole = value),
-      child: Column(
+      onTap: () => setState(() => selectedRole = roleValue),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              // Icon Box
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? accentColor.withValues(alpha: 0.25)
-                      : Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected
-                        ? accentColor
-                        : Colors.white.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Icon(
-                  icon,
-                  size: 28,
-                  color: isSelected ? accentColor : Colors.white70,
-                ),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: isDark ? 0.18 : 0.12),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: isSelected ? iconColor : iconColor.withValues(alpha: 0.3),
+                width: 1.5,
               ),
-
-              const SizedBox(width: 16),
-
-              // Title + Badge
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      badge,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? accentColor : Colors.white54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Check Indicator
-              Container(
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected ? accentColor : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected ? accentColor : Colors.white30,
-                    width: 2,
-                  ),
-                ),
-                child: isSelected
-                    ? const Icon(Icons.check, size: 16, color: Color(0xFF0B132B))
-                    : null,
-              ),
-            ],
+            ),
+            child: Icon(icon, color: iconColor, size: 28),
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(width: 16),
 
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.7),
-              height: 1.4,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                    height: 1.35,
+                  ),
+                ),
+              ],
             ),
+          ),
+
+          const SizedBox(width: 8),
+
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF00E676) : Colors.transparent,
+              border: Border.all(
+                color: isSelected ? const Color(0xFF00E676) : (isDark ? Colors.white38 : Colors.black26),
+                width: 2,
+              ),
+            ),
+            child: isSelected
+                ? const Icon(Icons.check, size: 14, color: Color(0xFF0B132B))
+                : null,
           ),
         ],
       ),

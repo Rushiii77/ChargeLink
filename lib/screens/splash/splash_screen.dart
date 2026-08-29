@@ -60,11 +60,10 @@ class _SplashScreenState extends State<SplashScreen>
                   children: [
                     // Floating Crystal Logo Card
                     GlassContainer(
+                      tier: GlassTier.primary,
                       width: 140,
                       height: 140,
                       borderRadius: BorderRadius.circular(36),
-                      blur: 24,
-                      opacity: 0.18,
                       glowColor: const Color(0xFF00E676),
                       glowSpread: 4,
                       child: Center(

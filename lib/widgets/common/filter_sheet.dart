@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/theme_service.dart';
 import '../glass/glass_button.dart';
 import '../glass/glass_container.dart';
 
@@ -61,7 +62,10 @@ class _FilterSheetState extends State<FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return GlassContainer(
+      tier: GlassTier.primary,
       padding: EdgeInsets.only(
         top: 20,
         left: 24,
@@ -69,10 +73,6 @@ class _FilterSheetState extends State<FilterSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      blur: 28,
-      opacity: 0.45,
-      color: const Color(0xFF0B132B),
-      borderColor: Colors.white.withValues(alpha: 0.2),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +83,7 @@ class _FilterSheetState extends State<FilterSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -92,12 +92,12 @@ class _FilterSheetState extends State<FilterSheet> {
 
           Row(
             children: [
-              const Text(
-                'Filter Chargers',
+              Text(
+                'Filter Stations',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const Spacer(),
@@ -110,7 +110,7 @@ class _FilterSheetState extends State<FilterSheet> {
                 child: const Text(
                   'Reset',
                   style: TextStyle(
-                    color: Colors.redAccent,
+                    color: Color(0xFFF43F5E),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -121,11 +121,12 @@ class _FilterSheetState extends State<FilterSheet> {
           const SizedBox(height: 16),
 
           // Charger Type
-          _buildSectionLabel('Current Standard'),
+          _buildSectionLabel('Current Standard', isDark),
           const SizedBox(height: 8),
           _buildChipGroup(
             options: ['All', 'AC', 'DC'],
             selected: _filter.chargerType,
+            isDark: isDark,
             onSelected: (v) =>
                 setState(() => _filter = _filter.copyWith(chargerType: v)),
           ),
@@ -133,11 +134,12 @@ class _FilterSheetState extends State<FilterSheet> {
           const SizedBox(height: 16),
 
           // Connector Type
-          _buildSectionLabel('Connector Port'),
+          _buildSectionLabel('Connector Port', isDark),
           const SizedBox(height: 8),
           _buildChipGroup(
             options: ['All', 'CCS2', 'Type2', 'CHAdeMO'],
             selected: _filter.connectorType,
+            isDark: isDark,
             onSelected: (v) =>
                 setState(() => _filter = _filter.copyWith(connectorType: v)),
           ),
@@ -145,12 +147,13 @@ class _FilterSheetState extends State<FilterSheet> {
           const SizedBox(height: 16),
 
           // Minimum Power
-          _buildSectionLabel('Minimum Speed Rating'),
+          _buildSectionLabel('Minimum Speed Rating', isDark),
           const SizedBox(height: 8),
           _buildChipGroupDouble(
             options: const [0, 7.4, 22, 50, 100],
             labels: const ['Any', '7+ kW', '22+ kW', '50+ kW', '100+ kW'],
             selected: _filter.minPowerKw,
+            isDark: isDark,
             onSelected: (v) =>
                 setState(() => _filter = _filter.copyWith(minPowerKw: v)),
           ),
@@ -160,9 +163,13 @@ class _FilterSheetState extends State<FilterSheet> {
           // Availability Switch
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
-            title: const Text(
+            title: Text(
               'Show available stations only',
-              style: TextStyle(fontSize: 14, color: Colors.white),
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                fontWeight: FontWeight.w500,
+              ),
             ),
             value: _filter.availableOnly,
             activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.5),
@@ -187,13 +194,13 @@ class _FilterSheetState extends State<FilterSheet> {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildSectionLabel(String label, bool isDark) {
     return Text(
       label,
       style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: Colors.white.withValues(alpha: 0.8),
+        color: isDark ? Colors.white.withValues(alpha: 0.8) : const Color(0xFF475569),
       ),
     );
   }
@@ -201,6 +208,7 @@ class _FilterSheetState extends State<FilterSheet> {
   Widget _buildChipGroup({
     required List<String> options,
     required String selected,
+    required bool isDark,
     required ValueChanged<String> onSelected,
   }) {
     return Wrap(
@@ -211,10 +219,12 @@ class _FilterSheetState extends State<FilterSheet> {
           label: Text(opt),
           selected: isSelected,
           onSelected: (_) => onSelected(opt),
-          selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
-          backgroundColor: Colors.white.withValues(alpha: 0.08),
+          selectedColor: const Color(0xFF00E676).withValues(alpha: isDark ? 0.25 : 0.2),
+          backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
           labelStyle: TextStyle(
-            color: isSelected ? const Color(0xFF00E676) : Colors.white70,
+            color: isSelected
+                ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
+                : (isDark ? Colors.white70 : const Color(0xFF475569)),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 12,
           ),
@@ -223,7 +233,7 @@ class _FilterSheetState extends State<FilterSheet> {
             side: BorderSide(
               color: isSelected
                   ? const Color(0xFF00E676)
-                  : Colors.white.withValues(alpha: 0.15),
+                  : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
             ),
           ),
         );
@@ -235,6 +245,7 @@ class _FilterSheetState extends State<FilterSheet> {
     required List<double> options,
     required List<String> labels,
     required double selected,
+    required bool isDark,
     required ValueChanged<double> onSelected,
   }) {
     return Wrap(
@@ -245,10 +256,12 @@ class _FilterSheetState extends State<FilterSheet> {
           label: Text(labels[i]),
           selected: isSelected,
           onSelected: (_) => onSelected(options[i]),
-          selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
-          backgroundColor: Colors.white.withValues(alpha: 0.08),
+          selectedColor: const Color(0xFF00E676).withValues(alpha: isDark ? 0.25 : 0.2),
+          backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
           labelStyle: TextStyle(
-            color: isSelected ? const Color(0xFF00E676) : Colors.white70,
+            color: isSelected
+                ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
+                : (isDark ? Colors.white70 : const Color(0xFF475569)),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 12,
           ),
@@ -257,7 +270,7 @@ class _FilterSheetState extends State<FilterSheet> {
             side: BorderSide(
               color: isSelected
                   ? const Color(0xFF00E676)
-                  : Colors.white.withValues(alpha: 0.15),
+                  : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
             ),
           ),
         );

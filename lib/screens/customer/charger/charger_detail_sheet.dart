@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/charger_model.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
 import '../booking/booking_screen.dart';
@@ -11,13 +12,12 @@ class ChargerDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return GlassContainer(
+      tier: GlassTier.primary,
       padding: const EdgeInsets.all(24),
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      blur: 28,
-      opacity: 0.45,
-      color: const Color(0xFF0B132B),
-      borderColor: Colors.white.withValues(alpha: 0.2),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,7 +28,7 @@ class ChargerDetailSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -42,10 +42,10 @@ class ChargerDetailSheet extends StatelessWidget {
               Expanded(
                 child: Text(
                   charger.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
               ),
@@ -54,8 +54,8 @@ class ChargerDetailSheet extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: charger.isAvailable
-                      ? const Color(0xFF00E676).withValues(alpha: 0.2)
-                      : Colors.redAccent.withValues(alpha: 0.2),
+                      ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15)
+                      : Colors.redAccent.withValues(alpha: isDark ? 0.2 : 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: charger.isAvailable
@@ -69,7 +69,7 @@ class ChargerDetailSheet extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                     color: charger.isAvailable
-                        ? const Color(0xFF00E676)
+                        ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
                         : Colors.redAccent.shade100,
                   ),
                 ),
@@ -82,13 +82,17 @@ class ChargerDetailSheet extends StatelessWidget {
           // Address
           Row(
             children: [
-              Icon(Icons.location_on_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)),
+              Icon(
+                Icons.location_on_rounded,
+                size: 16,
+                color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+              ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   charger.address,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
                     fontSize: 13,
                   ),
                 ),
@@ -97,7 +101,9 @@ class ChargerDetailSheet extends StatelessWidget {
           ),
 
           const SizedBox(height: 18),
-          Divider(color: Colors.white.withValues(alpha: 0.15)),
+          Divider(
+            color: isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.08),
+          ),
           const SizedBox(height: 16),
 
           // 2x2 Glass Specs Grid
@@ -108,6 +114,7 @@ class ChargerDetailSheet extends StatelessWidget {
                 iconColor: const Color(0xFFFFB300),
                 label: 'Charging Speed',
                 value: charger.powerLabel,
+                isDark: isDark,
               ),
               const SizedBox(width: 12),
               _glassSpecTile(
@@ -115,6 +122,7 @@ class ChargerDetailSheet extends StatelessWidget {
                 iconColor: const Color(0xFF00E5FF),
                 label: 'Connector Standard',
                 value: charger.connectorType,
+                isDark: isDark,
               ),
             ],
           ),
@@ -128,6 +136,7 @@ class ChargerDetailSheet extends StatelessWidget {
                 iconColor: const Color(0xFF00E676),
                 label: 'Energy Rate',
                 value: '₹${charger.pricePerKwh.toStringAsFixed(0)} / kWh',
+                isDark: isDark,
               ),
               const SizedBox(width: 12),
               _glassSpecTile(
@@ -135,6 +144,7 @@ class ChargerDetailSheet extends StatelessWidget {
                 iconColor: const Color(0xFFFFB300),
                 label: 'User Rating',
                 value: charger.ratingLabel,
+                isDark: isDark,
               ),
             ],
           ),
@@ -170,19 +180,19 @@ class ChargerDetailSheet extends StatelessWidget {
     required Color iconColor,
     required String label,
     required String value,
+    required bool isDark,
   }) {
     return Expanded(
       child: GlassContainer(
+        tier: GlassTier.tertiary,
         padding: const EdgeInsets.all(12),
         borderRadius: BorderRadius.circular(16),
-        blur: 16,
-        opacity: 0.1,
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.15),
+                color: iconColor.withValues(alpha: isDark ? 0.18 : 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, size: 20, color: iconColor),
@@ -196,15 +206,15 @@ class ChargerDetailSheet extends StatelessWidget {
                     label,
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
                     ),
                   ),
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/ai_recommendation_service.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_container.dart';
 import '../booking/booking_screen.dart';
 
@@ -32,6 +33,8 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     final recommendations = _aiService.getRecommendations(
       allChargers: widget.allChargers,
       userLat: widget.userLat,
@@ -42,12 +45,9 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
     );
 
     return GlassContainer(
+      tier: GlassTier.primary,
       height: MediaQuery.of(context).size.height * 0.85,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      blur: 28,
-      opacity: 0.45,
-      color: const Color(0xFF0B132B),
-      borderColor: Colors.white.withValues(alpha: 0.2),
       child: Column(
         children: [
           // Drag handle
@@ -56,7 +56,7 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -70,7 +70,7 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00E676).withValues(alpha: 0.2),
+                    color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: const Color(0xFF00E676).withValues(alpha: 0.4),
@@ -87,49 +87,56 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "AI Quantum Matcher",
+                      Text(
+                        "AI Smart Mobility Engine",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
                       Text(
-                        "Real-time scoring based on battery telemetry",
+                        "Optimized charging recommendations based on telemetry",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.white.withValues(alpha: 0.65),
+                          color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
                         ),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 14),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+          const SizedBox(height: 12),
+          Divider(
+            height: 1,
+            color: isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.08),
+          ),
 
-          // Scrollable Content
+          // Scrollable Area
           Expanded(
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Battery Slider Glass Card
+                  // Battery Slider Box
                   GlassContainer(
+                    tier: GlassTier.secondary,
                     padding: const EdgeInsets.all(16),
                     borderRadius: BorderRadius.circular(20),
-                    blur: 16,
-                    opacity: 0.1,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,14 +145,13 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                               "Current: ${_currentBattery.toInt()}%",
                               style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
                               ),
                             ),
                             Text(
                               "Target: ${_targetBattery.toInt()}%",
                               style: const TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF00E676),
                               ),
@@ -155,9 +161,10 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                         SliderTheme(
                           data: SliderTheme.of(context).copyWith(
                             activeTrackColor: const Color(0xFF00E676),
-                            inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
+                            inactiveTrackColor: isDark
+                                ? Colors.white.withValues(alpha: 0.15)
+                                : Colors.black.withValues(alpha: 0.1),
                             thumbColor: const Color(0xFF00E676),
-                            trackHeight: 6,
                           ),
                           child: Slider(
                             value: _targetBattery,
@@ -173,32 +180,38 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
 
                   const SizedBox(height: 18),
 
-                  // Strategy Goal Chips
-                  const Text(
+                  // Preference Chips
+                  Text(
                     "Optimization Goal",
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(height: 8),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
                     child: Row(
                       children: _preferences.map((pref) {
-                        final isSelected = pref == _selectedPreference;
+                        final isSelected = _selectedPreference == pref;
                         return Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: ChoiceChip(
-                            label: Text(pref == 'Balanced' ? '⚡ AI Optimal' : pref),
+                            label: Text(pref),
                             selected: isSelected,
                             onSelected: (_) =>
                                 setState(() => _selectedPreference = pref),
-                            selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
-                            backgroundColor: Colors.white.withValues(alpha: 0.08),
+                            selectedColor: const Color(0xFF00E676)
+                                .withValues(alpha: isDark ? 0.25 : 0.2),
+                            backgroundColor: isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : Colors.black.withValues(alpha: 0.04),
                             labelStyle: TextStyle(
-                              color: isSelected ? const Color(0xFF00E676) : Colors.white70,
+                              color: isSelected
+                                  ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
+                                  : (isDark ? Colors.white70 : const Color(0xFF475569)),
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                               fontSize: 12,
                             ),
@@ -207,7 +220,7 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                               side: BorderSide(
                                 color: isSelected
                                     ? const Color(0xFF00E676)
-                                    : Colors.white.withValues(alpha: 0.15),
+                                    : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
                               ),
                             ),
                           ),
@@ -221,10 +234,10 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                   // Match List
                   Text(
                     "Optimal Matches (${recommendations.length})",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -235,12 +248,14 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                         padding: const EdgeInsets.all(24),
                         child: Text(
                           "No stations available for this criteria.",
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                          style: TextStyle(
+                            color: isDark ? Colors.white60 : const Color(0xFF64748B),
+                          ),
                         ),
                       ),
                     )
                   else
-                    ...recommendations.map((rec) => _buildRecommendationCard(rec)),
+                    ...recommendations.map((rec) => _buildRecommendationCard(rec, isDark)),
                 ],
               ),
             ),
@@ -250,16 +265,15 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
     );
   }
 
-  Widget _buildRecommendationCard(RecommendationResult rec) {
+  Widget _buildRecommendationCard(RecommendationResult rec, bool isDark) {
     return GlassContainer(
+      tier: GlassTier.secondary,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(22),
-      blur: 20,
-      opacity: 0.12,
       borderColor: rec.score > 85
           ? const Color(0xFF00E676).withValues(alpha: 0.5)
-          : Colors.white.withValues(alpha: 0.15),
+          : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
       borderWidth: rec.score > 85 ? 1.5 : 1,
       glowColor: rec.score > 85 ? const Color(0xFF00E676) : null,
       glowSpread: rec.score > 85 ? 1 : 0,
@@ -273,7 +287,7 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withValues(alpha: 0.2),
+                  color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: const Color(0xFF00E676).withValues(alpha: 0.4),
@@ -285,10 +299,10 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                     const SizedBox(width: 4),
                     Text(
                       rec.tag,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF00E676),
+                        color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
                       ),
                     ),
                   ],
@@ -297,16 +311,18 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.08),
+                  ),
                 ),
                 child: Text(
                   "${rec.score.toInt()}% Match",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
               ),
@@ -318,10 +334,10 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
           // Name
           Text(
             rec.charger.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           const SizedBox(height: 2),
@@ -329,7 +345,7 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
             rec.charger.address,
             style: TextStyle(
               fontSize: 11,
-              color: Colors.white.withValues(alpha: 0.65),
+              color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -341,9 +357,11 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
+              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(
+                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
+              ),
             ),
             child: Row(
               children: [
@@ -354,7 +372,7 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
                     rec.reasoning,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: isDark ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF334155),
                     ),
                   ),
                 ),
@@ -369,21 +387,21 @@ class _SmartRecommendationSheetState extends State<SmartRecommendationSheet> {
             children: [
               Text(
                 "~${rec.estimatedTimeMinutes.toInt()} mins",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(width: 8),
-              Text("•", style: TextStyle(color: Colors.white.withValues(alpha: 0.4))),
+              Text("•", style: TextStyle(color: isDark ? Colors.white38 : Colors.black26)),
               const SizedBox(width: 8),
               Text(
                 "Est. ₹${rec.estimatedCost.toStringAsFixed(0)}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF00E676),
+                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
                 ),
               ),
               const Spacer(),

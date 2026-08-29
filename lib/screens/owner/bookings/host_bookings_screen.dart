@@ -5,6 +5,7 @@ import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/booking_service.dart';
 import '../../../services/charger_service.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
@@ -36,24 +37,28 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
   }
 
   void _verifyPinAndStart(BookingModel booking) {
+    final isDark = ThemeService.isDark(context);
     final pinController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0B132B),
+        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.08)),
         ),
-        title: const Text("Verify Check-in PIN", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          "Verify Check-in PIN",
+          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "Ask driver for the 4-digit PIN generated for ${booking.chargerName}.",
-              style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.7)),
+              style: TextStyle(fontSize: 13, color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B)),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -69,13 +74,13 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
               ),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white.withValues(alpha: 0.08),
+                fillColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
                 counterText: "",
                 hintText: "••••",
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black26),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
-                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                  borderSide: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.08)),
                 ),
               ),
             ),
@@ -84,7 +89,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white60)),
+            child: Text("Cancel", style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -99,16 +104,17 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                 await _bookingService.updateBookingStatus(booking.id, 'active');
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("PIN Verified! Charging session is now ACTIVE."),
-                    backgroundColor: Color(0xFF00E676),
+                  SnackBar(
+                    content: Text("✓ PIN Verified! Charging session activated for ${booking.chargerName}."),
+                    backgroundColor: const Color(0xFF00E676),
                     behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text("Incorrect PIN. Please re-check with driver."),
+                    content: const Text("Invalid PIN entered. Please check with driver."),
                     backgroundColor: Colors.redAccent.shade700,
                     behavior: SnackBarBehavior.floating,
                   ),
@@ -123,23 +129,28 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
   }
 
   Future<void> _completeSession(BookingModel booking) async {
+    final isDark = ThemeService.isDark(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0B132B),
+        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
         ),
-        title: const Text("Complete Session", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          "Complete Session?",
+          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontWeight: FontWeight.bold),
+        ),
         content: Text(
-          "Mark charging session at '${booking.chargerName}' as completed?",
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+          "Mark charging session as completed and settle payment?",
+          style: TextStyle(color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white60)),
+            child: Text("Cancel", style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -159,7 +170,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Session completed! ₹${booking.totalAmount.toStringAsFixed(0)} added to revenue."),
+          content: Text("Session completed! ₹${booking.totalAmount.toStringAsFixed(0)} settled."),
           backgroundColor: const Color(0xFF00E676),
           behavior: SnackBarBehavior.floating,
         ),
@@ -170,158 +181,170 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
   @override
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
+    final isDark = ThemeService.isDark(context);
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("Please login first", style: TextStyle(color: Colors.white))),
+      return Scaffold(
+        body: Center(
+          child: Text("Please login first", style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A))),
+        ),
       );
     }
 
     return Scaffold(
       body: GlassBackground(
         child: SafeArea(
-          child: Column(
-            children: [
-              // Top Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Row(
-                  children: [
-                    GlassContainer(
-                      width: 44,
-                      height: 44,
-                      borderRadius: BorderRadius.circular(14),
-                      blur: 16,
-                      opacity: 0.1,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
-                        onPressed: () => Navigator.pop(context),
+          child: StreamBuilder<List<ChargerModel>>(
+            stream: _chargerService.streamOwnerChargers(user.uid),
+            builder: (context, chargerSnapshot) {
+              final myChargers = chargerSnapshot.data ?? [];
+              final myChargerIds = myChargers.map((c) => c.id).toSet();
+
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('bookings').snapshots(),
+                builder: (context, bookingSnapshot) {
+                  final allDocs = bookingSnapshot.data?.docs ?? [];
+                  final hostBookings = allDocs
+                      .map((doc) => BookingModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+                      .where((b) => myChargerIds.contains(b.chargerId))
+                      .toList();
+
+                  // Sort by start time
+                  hostBookings.sort((a, b) => b.startTime.compareTo(a.startTime));
+
+                  final incoming = hostBookings
+                      .where((b) => b.status.toLowerCase() == 'confirmed')
+                      .toList();
+
+                  final inProgress = hostBookings
+                      .where((b) => b.status.toLowerCase() == 'active')
+                      .toList();
+
+                  final past = hostBookings
+                      .where((b) =>
+                          b.status.toLowerCase() == 'completed' ||
+                          b.status.toLowerCase() == 'cancelled')
+                      .toList();
+
+                  return Column(
+                    children: [
+                      // App Bar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: Row(
+                          children: [
+                            GlassContainer(
+                              tier: GlassTier.tertiary,
+                              width: 44,
+                              height: 44,
+                              borderRadius: BorderRadius.circular(14),
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  size: 18,
+                                ),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Text(
+                              "Host Booking Dispatch",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    const Text(
-                      "Station Bookings",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+
+                      // Tab Bar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                        child: GlassContainer(
+                          tier: GlassTier.secondary,
+                          borderRadius: BorderRadius.circular(18),
+                          padding: const EdgeInsets.all(4),
+                          child: TabBar(
+                            controller: _tabController,
+                            indicator: BoxDecoration(
+                              color: const Color(0xFF00E676),
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF00E676).withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            dividerColor: Colors.transparent,
+                            labelColor: const Color(0xFF0B132B),
+                            unselectedLabelColor: isDark ? Colors.white60 : const Color(0xFF64748B),
+                            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            tabs: [
+                              Tab(text: "Incoming (${incoming.length})"),
+                              Tab(text: "In Progress (${inProgress.length})"),
+                              Tab(text: "Past (${past.length})"),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
 
-              // Glass Tab Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: GlassContainer(
-                  padding: const EdgeInsets.all(4),
-                  borderRadius: BorderRadius.circular(20),
-                  blur: 16,
-                  opacity: 0.1,
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      color: const Color(0xFF00E676),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    labelColor: const Color(0xFF0B132B),
-                    unselectedLabelColor: Colors.white60,
-                    dividerColor: Colors.transparent,
-                    labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                    tabs: const [
-                      Tab(text: "Confirmed"),
-                      Tab(text: "In Progress"),
-                      Tab(text: "History"),
-                    ],
-                  ),
-                ),
-              ),
+                      const SizedBox(height: 10),
 
-              const SizedBox(height: 12),
-
-              Expanded(
-                child: StreamBuilder<List<ChargerModel>>(
-                  stream: _chargerService.streamOwnerChargers(user.uid),
-                  builder: (context, chargerSnapshot) {
-                    if (chargerSnapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator(color: Color(0xFF00E676)));
-                    }
-
-                    final myChargers = chargerSnapshot.data ?? [];
-                    final myChargerIds = myChargers.map((c) => c.id).toSet();
-
-                    return StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance.collection('bookings').snapshots(),
-                      builder: (context, bookingSnapshot) {
-                        if (bookingSnapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator(color: Color(0xFF00E676)));
-                        }
-
-                        final allDocs = bookingSnapshot.data?.docs ?? [];
-                        final hostBookings = allDocs
-                            .map((doc) => BookingModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
-                            .where((b) => myChargerIds.contains(b.chargerId))
-                            .toList();
-
-                        hostBookings.sort((a, b) => b.startTime.compareTo(a.startTime));
-
-                        final confirmed = hostBookings.where((b) => b.status.toLowerCase() == 'confirmed').toList();
-                        final active = hostBookings.where((b) => b.status.toLowerCase() == 'active').toList();
-                        final history = hostBookings.where((b) => b.status.toLowerCase() == 'completed' || b.status.toLowerCase() == 'cancelled').toList();
-
-                        return TabBarView(
+                      // Tabs Content
+                      Expanded(
+                        child: TabBarView(
                           controller: _tabController,
                           children: [
-                            _buildList(confirmed, "No pending reservations"),
-                            _buildList(active, "No sessions in progress"),
-                            _buildList(history, "No previous session history"),
+                            _buildHostBookingList(incoming, "No incoming driver slots", isDark),
+                            _buildHostBookingList(inProgress, "No active charging sessions", isDark),
+                            _buildHostBookingList(past, "No past sessions recorded", isDark),
                           ],
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildList(List<BookingModel> bookings, String emptyMsg) {
+  Widget _buildHostBookingList(List<BookingModel> bookings, String emptyMessage, bool isDark) {
     if (bookings.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GlassContainer(
-              width: 80,
-              height: 80,
-              borderRadius: BorderRadius.circular(24),
-              blur: 16,
-              opacity: 0.1,
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                shape: BoxShape.circle,
+              ),
               child: const Icon(
-                Icons.calendar_month_rounded,
-                size: 38,
+                Icons.event_available_rounded,
+                size: 40,
                 color: Color(0xFF00E676),
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              emptyMsg,
-              style: const TextStyle(
+              emptyMessage,
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              "Reservations made by EV drivers will appear here.",
-              style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.6)),
             ),
           ],
         ),
@@ -329,26 +352,45 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       itemCount: bookings.length,
-      itemBuilder: (ctx, index) => _buildBookingCard(bookings[index]),
+      itemBuilder: (ctx, index) => _buildHostBookingCard(bookings[index], isDark),
     );
   }
 
-  Widget _buildBookingCard(BookingModel booking) {
-    final isConfirmed = booking.status.toLowerCase() == 'confirmed';
-    final isActive = booking.status.toLowerCase() == 'active';
+  Widget _buildHostBookingCard(BookingModel booking, bool isDark) {
+    Color statusColor;
 
-    final dateStr = "${booking.startTime.day}/${booking.startTime.month}/${booking.startTime.year}";
-    final timeStr =
+    switch (booking.status.toLowerCase()) {
+      case 'confirmed':
+        statusColor = const Color(0xFF00E676);
+        break;
+      case 'active':
+        statusColor = const Color(0xFF00E5FF);
+        break;
+      case 'completed':
+        statusColor = isDark ? Colors.white60 : const Color(0xFF64748B);
+        break;
+      case 'cancelled':
+        statusColor = Colors.redAccent.shade200;
+        break;
+      default:
+        statusColor = isDark ? Colors.white60 : const Color(0xFF64748B);
+    }
+
+    final dateStr =
+        "${booking.startTime.day}/${booking.startTime.month}/${booking.startTime.year}";
+    final startTimeStr =
         "${booking.startTime.hour.toString().padLeft(2, '0')}:${booking.startTime.minute.toString().padLeft(2, '0')}";
+    final endTimeStr =
+        "${booking.endTime.hour.toString().padLeft(2, '0')}:${booking.endTime.minute.toString().padLeft(2, '0')}";
 
     return GlassContainer(
+      tier: GlassTier.secondary,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
       borderRadius: BorderRadius.circular(24),
-      blur: 20,
-      opacity: 0.12,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -357,48 +399,87 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
               Expanded(
                 child: Text(
                   booking.chargerName,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
                 ),
               ),
-              Text(
-                "₹${booking.totalAmount.toStringAsFixed(0)}",
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF00E676)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: isDark ? 0.15 : 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  booking.formattedStatus,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: statusColor,
+                  ),
+                ),
               ),
             ],
           ),
+
           const SizedBox(height: 3),
           Text(
-            "Reserved for $dateStr at $timeStr (${booking.durationMinutes} mins)",
-            style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.65)),
+            "$dateStr • $startTimeStr - $endTimeStr (${booking.durationMinutes} mins)",
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+          Divider(
+            height: 1,
+            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
           ),
           const SizedBox(height: 12),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.1)),
+
+          Row(
+            children: [
+              Text(
+                "${booking.powerKw.toInt()} kW ${booking.connectorType}",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                "Revenue: ₹${booking.totalAmount.toStringAsFixed(0)}",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                ),
+              ),
+            ],
+          ),
+
           const SizedBox(height: 14),
-          if (isConfirmed) ...[
+
+          // Action Buttons: Verify PIN or Complete
+          if (booking.status.toLowerCase() == 'confirmed') ...[
             GlassButton(
-              text: "VERIFY PIN & START SESSION",
+              text: "VERIFY DRIVER PIN & START",
+              icon: Icons.qr_code_scanner_rounded,
               height: 48,
-              icon: Icons.pin_rounded,
               onPressed: () => _verifyPinAndStart(booking),
             ),
-          ] else if (isActive) ...[
+          ] else if (booking.status.toLowerCase() == 'active') ...[
             GlassButton(
-              text: "COMPLETE CHARGING SESSION",
+              text: "COMPLETE & SETTLE CHARGING",
+              icon: Icons.check_circle_rounded,
               height: 48,
               color: const Color(0xFF00E5FF),
-              icon: Icons.check_circle_outline_rounded,
               onPressed: () => _completeSession(booking),
-            ),
-          ] else ...[
-            Row(
-              children: [
-                const Icon(Icons.done_all_rounded, size: 16, color: Colors.white60),
-                const SizedBox(width: 6),
-                Text(
-                  "Status: ${booking.formattedStatus}",
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white70),
-                ),
-              ],
             ),
           ],
         ],

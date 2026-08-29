@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/charger_model.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
@@ -33,12 +34,14 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
     final needsChargingStop = _currentEstimatedRangeKm < _tripDistanceKm + 30;
 
     return Scaffold(
       body: GlassBackground(
         child: SafeArea(
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,24 +50,27 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 Row(
                   children: [
                     GlassContainer(
+                      tier: GlassTier.tertiary,
                       width: 44,
                       height: 44,
                       borderRadius: BorderRadius.circular(14),
-                      blur: 16,
-                      opacity: 0.1,
                       child: IconButton(
                         padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          size: 18,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Text(
+                    Text(
                       "EV Trip & Route Planner",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                   ],
@@ -74,10 +80,9 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
                 // Route Form Box
                 GlassContainer(
+                  tier: GlassTier.secondary,
                   padding: const EdgeInsets.all(18),
                   borderRadius: BorderRadius.circular(24),
-                  blur: 20,
-                  opacity: 0.12,
                   child: Column(
                     children: [
                       GlassTextField(
@@ -99,30 +104,39 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
                 // Battery Range Slider
                 GlassContainer(
+                  tier: GlassTier.secondary,
                   padding: const EdgeInsets.all(18),
                   borderRadius: BorderRadius.circular(24),
-                  blur: 20,
-                  opacity: 0.12,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             "Current Battery Level",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
                           ),
                           Text(
                             "${_currentBattery.toInt()}% (~${_currentEstimatedRangeKm.toInt()} km)",
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF00E676)),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                            ),
                           ),
                         ],
                       ),
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           activeTrackColor: const Color(0xFF00E676),
-                          inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
+                          inactiveTrackColor: isDark
+                              ? Colors.white.withValues(alpha: 0.15)
+                              : Colors.black.withValues(alpha: 0.1),
                           thumbColor: const Color(0xFF00E676),
                         ),
                         child: Slider(
@@ -142,27 +156,38 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 if (_isCalculated) ...[
                   // Trip Summary Banner
                   GlassContainer(
+                    tier: GlassTier.secondary,
                     padding: const EdgeInsets.all(18),
                     borderRadius: BorderRadius.circular(22),
-                    blur: 20,
-                    opacity: 0.15,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _tripMetric("Total Trip", "${_tripDistanceKm.toInt()} km", Icons.route_rounded),
-                        Container(width: 1, height: 36, color: Colors.white.withValues(alpha: 0.15)),
-                        _tripMetric("Est. Duration", "2 hrs 40m", Icons.timer_rounded),
-                        Container(width: 1, height: 36, color: Colors.white.withValues(alpha: 0.15)),
-                        _tripMetric("Stops Needed", needsChargingStop ? "1 Stop" : "0 Stops", Icons.ev_station_rounded),
+                        _tripMetric("Total Trip", "${_tripDistanceKm.toInt()} km", Icons.route_rounded, isDark),
+                        Container(
+                          width: 1,
+                          height: 36,
+                          color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08),
+                        ),
+                        _tripMetric("Est. Duration", "2 hrs 40m", Icons.timer_rounded, isDark),
+                        Container(
+                          width: 1,
+                          height: 36,
+                          color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08),
+                        ),
+                        _tripMetric("Stops Needed", needsChargingStop ? "1 Stop" : "0 Stops", Icons.ev_station_rounded, isDark),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 24),
 
-                  const Text(
+                  Text(
                     "Recommended Waypoint Stops",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
                   ),
                   const SizedBox(height: 12),
 
@@ -174,6 +199,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       power: "120 kW DC Fast",
                       suggestedDuration: "20 mins",
                       targetCharge: "Charge from 22% → 85%",
+                      isDark: isDark,
                       charger: ChargerModel(
                         id: 'expressway_1',
                         ownerId: 'seed',
@@ -190,19 +216,22 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     ),
                   ] else ...[
                     GlassContainer(
+                      tier: GlassTier.secondary,
                       padding: const EdgeInsets.all(20),
                       borderRadius: BorderRadius.circular(20),
-                      blur: 20,
-                      opacity: 0.12,
                       borderColor: const Color(0xFF00E676).withValues(alpha: 0.4),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.check_circle_rounded, color: Color(0xFF00E676), size: 28),
-                          SizedBox(width: 14),
+                          const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676), size: 28),
+                          const SizedBox(width: 14),
                           Expanded(
                             child: Text(
                               "You have enough battery to reach your destination without stopping!",
-                              style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -220,19 +249,26 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     );
   }
 
-  Widget _tripMetric(String label, String val, IconData icon) {
+  Widget _tripMetric(String label, String val, IconData icon, bool isDark) {
     return Column(
       children: [
         Icon(icon, size: 20, color: const Color(0xFF00E676)),
         const SizedBox(height: 6),
         Text(
           val,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.6)),
+          style: TextStyle(
+            fontSize: 11,
+            color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+          ),
         ),
       ],
     );
@@ -246,12 +282,12 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     required String suggestedDuration,
     required String targetCharge,
     required ChargerModel charger,
+    required bool isDark,
   }) {
     return GlassContainer(
+      tier: GlassTier.secondary,
       padding: const EdgeInsets.all(18),
       borderRadius: BorderRadius.circular(24),
-      blur: 20,
-      opacity: 0.12,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -275,35 +311,51 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               Expanded(
                 child: Text(
                   name,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withValues(alpha: 0.2),
+                  color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   suggestedDuration,
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF00E676)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                  ),
                 ),
               ),
             ],
           ),
 
           const SizedBox(height: 6),
-          Text(address, style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.65))),
+          Text(
+            address,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+            ),
+          ),
 
           const SizedBox(height: 12),
 
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
+              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(
+                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
+              ),
             ),
             child: Row(
               children: [
@@ -311,7 +363,11 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 const SizedBox(width: 6),
                 Text(
                   "$power • $targetCharge",
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
                 ),
               ],
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/auth_service.dart';
+import '../../services/theme_service.dart';
 import '../../widgets/glass/glass_background.dart';
 import '../../widgets/glass/glass_button.dart';
 import '../../widgets/glass/glass_container.dart';
@@ -109,185 +110,189 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return Scaffold(
       body: GlassBackground(
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: Column(
-                children: [
-                  // Header
-                  GlassContainer(
-                    width: 72,
-                    height: 72,
-                    borderRadius: BorderRadius.circular(22),
-                    blur: 16,
-                    opacity: 0.15,
-                    glowColor: const Color(0xFF00E5FF),
-                    glowSpread: 2,
-                    child: const Center(
-                      child: Icon(
-                        Icons.person_add_alt_1_rounded,
-                        size: 36,
-                        color: Color(0xFF00E5FF),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Floating Crystal Logo Icon
+                    GlassContainer(
+                      tier: GlassTier.secondary,
+                      width: 72,
+                      height: 72,
+                      borderRadius: BorderRadius.circular(22),
+                      glowColor: const Color(0xFF00E676),
+                      glowSpread: 2,
+                      child: const Center(
+                        child: Icon(
+                          Icons.person_add_alt_1_rounded,
+                          size: 36,
+                          color: Color(0xFF00E676),
+                        ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 18),
+                    const SizedBox(height: 18),
 
-                  const Text(
-                    "Create Account",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
+                    Text(
+                      "Create Account",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 6),
+                    const SizedBox(height: 6),
 
-                  Text(
-                    "Join the decentralized EV charging network",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.7),
+                    Text(
+                      "Join the ChargeLink EV charging ecosystem",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 28),
+                    const SizedBox(height: 26),
 
-                  // Frosted Form Card
-                  GlassContainer(
-                    padding: const EdgeInsets.all(22),
-                    borderRadius: BorderRadius.circular(28),
-                    blur: 24,
-                    opacity: 0.12,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        GlassTextField(
-                          controller: _nameController,
-                          labelText: "Full Name",
-                          hintText: "Elon Musk",
-                          prefixIcon: Icons.person_outline_rounded,
-                          textInputAction: TextInputAction.next,
-                        ),
+                    // Form Glass Card
+                    GlassContainer(
+                      tier: GlassTier.secondary,
+                      padding: const EdgeInsets.all(22),
+                      borderRadius: BorderRadius.circular(28),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          GlassTextField(
+                            controller: _nameController,
+                            labelText: "Full Name",
+                            hintText: "Elon Musk",
+                            prefixIcon: Icons.person_outline_rounded,
+                            textInputAction: TextInputAction.next,
+                          ),
 
-                        const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-                        GlassTextField(
-                          controller: _emailController,
-                          labelText: "Email Address",
-                          hintText: "driver@ev.com",
-                          prefixIcon: Icons.email_outlined,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                        ),
+                          GlassTextField(
+                            controller: _emailController,
+                            labelText: "Email Address",
+                            hintText: "driver@chargelink.com",
+                            prefixIcon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                          ),
 
-                        const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-                        GlassTextField(
-                          controller: _phoneController,
-                          labelText: "Phone Number",
-                          hintText: "+91 98765 43210",
-                          prefixIcon: Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
-                          textInputAction: TextInputAction.next,
-                        ),
+                          GlassTextField(
+                            controller: _phoneController,
+                            labelText: "Phone Number",
+                            hintText: "+91 98765 43210",
+                            prefixIcon: Icons.phone_outlined,
+                            keyboardType: TextInputType.phone,
+                            textInputAction: TextInputAction.next,
+                          ),
 
-                        const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-                        GlassTextField(
-                          controller: _passwordController,
-                          labelText: "Password",
-                          hintText: "••••••••",
-                          prefixIcon: Icons.lock_outline_rounded,
-                          obscureText: _hidePassword,
-                          textInputAction: TextInputAction.next,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _hidePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.white60,
-                              size: 20,
+                          GlassTextField(
+                            controller: _passwordController,
+                            labelText: "Password",
+                            hintText: "••••••••",
+                            prefixIcon: Icons.lock_outline_rounded,
+                            obscureText: _hidePassword,
+                            textInputAction: TextInputAction.next,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _hidePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: isDark ? Colors.white60 : const Color(0xFF94A3B8),
+                                size: 20,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _hidePassword = !_hidePassword),
                             ),
-                            onPressed: () =>
-                                setState(() => _hidePassword = !_hidePassword),
                           ),
-                        ),
 
-                        const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-                        GlassTextField(
-                          controller: _confirmPasswordController,
-                          labelText: "Confirm Password",
-                          hintText: "••••••••",
-                          prefixIcon: Icons.lock_reset_rounded,
-                          obscureText: _hideConfirmPassword,
-                          textInputAction: TextInputAction.done,
-                          onFieldSubmitted: (_) => _registerUser(),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _hideConfirmPassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.white60,
-                              size: 20,
+                          GlassTextField(
+                            controller: _confirmPasswordController,
+                            labelText: "Confirm Password",
+                            hintText: "••••••••",
+                            prefixIcon: Icons.lock_reset_rounded,
+                            obscureText: _hideConfirmPassword,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _registerUser(),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _hideConfirmPassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: isDark ? Colors.white60 : const Color(0xFF94A3B8),
+                                size: 20,
+                              ),
+                              onPressed: () => setState(
+                                  () => _hideConfirmPassword = !_hideConfirmPassword),
                             ),
-                            onPressed: () => setState(
-                                () => _hideConfirmPassword = !_hideConfirmPassword),
                           ),
-                        ),
 
-                        const SizedBox(height: 24),
+                          const SizedBox(height: 24),
 
-                        GlassButton(
-                          text: "CREATE ACCOUNT",
-                          isLoading: _isLoading,
-                          icon: Icons.flash_on_rounded,
-                          onPressed: _registerUser,
-                        ),
-                      ],
+                          GlassButton(
+                            text: "CREATE ACCOUNT",
+                            isLoading: _isLoading,
+                            icon: Icons.check_circle_outline_rounded,
+                            onPressed: _registerUser,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Back to Login
-                  GlassContainer(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    borderRadius: BorderRadius.circular(24),
-                    blur: 16,
-                    opacity: 0.08,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Already registered?",
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
-                            fontSize: 13,
+                    // Already have account
+                    GlassContainer(
+                      tier: GlassTier.tertiary,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      borderRadius: BorderRadius.circular(24),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Already have an account?",
+                            style: TextStyle(
+                              color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF00E676),
-                            padding: const EdgeInsets.only(left: 8),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF00E676),
+                              padding: const EdgeInsets.only(left: 8),
+                            ),
+                            child: const Text(
+                              "Sign In",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
                           ),
-                          child: const Text(
-                            "Sign In",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

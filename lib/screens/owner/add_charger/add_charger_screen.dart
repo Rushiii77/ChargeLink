@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
@@ -102,64 +103,18 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
 
       if (!mounted) return;
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: const Color(0xFF0B132B),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
-          ),
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF00E676).withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFF00E676), width: 1.5),
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: Color(0xFF00E676),
-                    size: 48,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                const Text(
-                  "Station Published!",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "'$name' is now live on the quantum grid for all EV drivers.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.7)),
-                ),
-                const SizedBox(height: 24),
-                GlassButton(
-                  text: "GO TO DASHBOARD",
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("⚡ Charger published to the live network!"),
+          backgroundColor: const Color(0xFF00E676),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       );
+
+      Navigator.pop(context);
     } catch (e) {
-      _showToast("Error adding charger: $e", isError: true);
+      _showToast("Failed to add charger: $e", isError: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -179,10 +134,13 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return Scaffold(
       body: GlassBackground(
         child: SafeArea(
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Form(
               key: _formKey,
@@ -193,24 +151,27 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                   Row(
                     children: [
                       GlassContainer(
+                        tier: GlassTier.tertiary,
                         width: 44,
                         height: 44,
                         borderRadius: BorderRadius.circular(14),
-                        blur: 16,
-                        opacity: 0.1,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                          icon: Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            size: 18,
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ),
                       const SizedBox(width: 14),
-                      const Text(
-                        "List New Station",
+                      Text(
+                        "Add EV Charging Station",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
                     ],
@@ -218,163 +179,236 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
 
                   const SizedBox(height: 20),
 
-                  // Station Name
-                  _buildLabel("Station / Charger Name"),
-                  const SizedBox(height: 8),
-                  GlassTextField(
-                    controller: _nameController,
-                    labelText: "Station Name",
-                    hintText: "e.g. GreenPoint Fast Charging Hub",
-                    prefixIcon: Icons.ev_station_rounded,
-                    validator: (v) => v == null || v.trim().isEmpty ? "Enter station name" : null,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Address
-                  _buildLabel("Location Address"),
-                  const SizedBox(height: 8),
-                  GlassTextField(
-                    controller: _addressController,
-                    labelText: "Full Address",
-                    hintText: "e.g. Plot 12, Sector 15, Navi Mumbai",
-                    prefixIcon: Icons.location_on_outlined,
-                    validator: (v) => v == null || v.trim().isEmpty ? "Enter location address" : null,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // GPS Coordinates
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildLabel("Map Coordinates"),
-                      TextButton.icon(
-                        onPressed: _fetchCurrentLocation,
-                        icon: const Icon(Icons.my_location_rounded, size: 16, color: Color(0xFF00E676)),
-                        label: const Text("Use Current GPS", style: TextStyle(fontSize: 12, color: Color(0xFF00E676))),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GlassTextField(
-                          controller: _latController,
-                          labelText: "Latitude",
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  // Section 1: Basic Information
+                  _buildSectionTitle("1. Station Details", isDark),
+                  const SizedBox(height: 10),
+                  GlassContainer(
+                    tier: GlassTier.secondary,
+                    padding: const EdgeInsets.all(18),
+                    borderRadius: BorderRadius.circular(24),
+                    child: Column(
+                      children: [
+                        GlassTextField(
+                          controller: _nameController,
+                          labelText: "Station Name",
+                          hintText: "e.g. Apex Fast EV Hub",
+                          prefixIcon: Icons.ev_station_rounded,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? "Please enter station name"
+                              : null,
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: GlassTextField(
-                          controller: _lngController,
-                          labelText: "Longitude",
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        const SizedBox(height: 12),
+                        GlassTextField(
+                          controller: _addressController,
+                          labelText: "Full Location Address",
+                          hintText: "e.g. Sector 19, Seawoods, Navi Mumbai",
+                          prefixIcon: Icons.location_on_rounded,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? "Please enter address"
+                              : null,
                         ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Current Type (AC vs DC)
-                  _buildLabel("Current Standard"),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      _buildTypeChip("DC Fast Charger", "DC"),
-                      const SizedBox(width: 12),
-                      _buildTypeChip("AC Standard", "AC"),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Power Output
-                  _buildLabel("Power Output"),
-                  const SizedBox(height: 8),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _powerOptions.map((power) {
-                        final isSelected = power == _selectedPowerKw;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            label: Text("${power % 1 == 0 ? power.toInt() : power} kW"),
-                            selected: isSelected,
-                            onSelected: (_) => setState(() => _selectedPowerKw = power),
-                            selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
-                            backgroundColor: Colors.white.withValues(alpha: 0.08),
-                            labelStyle: TextStyle(
-                              color: isSelected ? const Color(0xFF00E676) : Colors.white70,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(
-                                color: isSelected ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.15),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
-                  // Connector Type
-                  _buildLabel("Connector Standard"),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: _connectorOptions.map((conn) {
-                      final isSelected = conn == _selectedConnector;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(conn),
-                          selected: isSelected,
-                          onSelected: (_) => setState(() => _selectedConnector = conn),
-                          selectedColor: const Color(0xFF00E676).withValues(alpha: 0.25),
-                          backgroundColor: Colors.white.withValues(alpha: 0.08),
-                          labelStyle: TextStyle(
-                            color: isSelected ? const Color(0xFF00E676) : Colors.white70,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            fontSize: 12,
+                  // Section 2: Technical Specifications
+                  _buildSectionTitle("2. Power & Charging Specs", isDark),
+                  const SizedBox(height: 10),
+                  GlassContainer(
+                    tier: GlassTier.secondary,
+                    padding: const EdgeInsets.all(18),
+                    borderRadius: BorderRadius.circular(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Current Standard",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                            fontWeight: FontWeight.w600,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: isSelected ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.15),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: ['DC', 'AC'].map((type) {
+                            final isSelected = _selectedChargerType == type;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: ChoiceChip(
+                                label: Text(type == 'DC' ? 'DC Fast Charging' : 'AC Standard'),
+                                selected: isSelected,
+                                onSelected: (_) => setState(() => _selectedChargerType = type),
+                                selectedColor: const Color(0xFF00E676).withValues(alpha: isDark ? 0.25 : 0.2),
+                                backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                labelStyle: TextStyle(
+                                  color: isSelected
+                                      ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
+                                      : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  side: BorderSide(
+                                    color: isSelected ? const Color(0xFF00E676) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        Text(
+                          "Power Output Rating (kW)",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: _powerOptions.map((kw) {
+                              final isSelected = _selectedPowerKw == kw;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: ChoiceChip(
+                                  label: Text("${kw.toInt()} kW"),
+                                  selected: isSelected,
+                                  onSelected: (_) => setState(() => _selectedPowerKw = kw),
+                                  selectedColor: const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.25 : 0.2),
+                                  backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                  labelStyle: TextStyle(
+                                    color: isSelected
+                                        ? const Color(0xFF00B4D8)
+                                        : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    side: BorderSide(
+                                      color: isSelected ? const Color(0xFF00E5FF) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        Text(
+                          "Connector Port Type",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: _connectorOptions.map((conn) {
+                            final isSelected = _selectedConnector == conn;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: ChoiceChip(
+                                label: Text(conn),
+                                selected: isSelected,
+                                onSelected: (_) => setState(() => _selectedConnector = conn),
+                                selectedColor: const Color(0xFF8B5CF6).withValues(alpha: isDark ? 0.25 : 0.2),
+                                backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                labelStyle: TextStyle(
+                                  color: isSelected
+                                      ? const Color(0xFF8B5CF6)
+                                      : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  side: BorderSide(
+                                    color: isSelected ? const Color(0xFF8B5CF6) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Section 3: Pricing & Location Coordinates
+                  _buildSectionTitle("3. Pricing & Coordinates", isDark),
+                  const SizedBox(height: 10),
+                  GlassContainer(
+                    tier: GlassTier.secondary,
+                    padding: const EdgeInsets.all(18),
+                    borderRadius: BorderRadius.circular(24),
+                    child: Column(
+                      children: [
+                        GlassTextField(
+                          controller: _priceController,
+                          labelText: "Tariff Price per kWh (₹)",
+                          keyboardType: TextInputType.number,
+                          prefixIcon: Icons.currency_rupee_rounded,
+                          validator: (v) => (v == null || double.tryParse(v) == null)
+                              ? "Enter valid price"
+                              : null,
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GlassTextField(
+                                controller: _latController,
+                                labelText: "Latitude",
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                prefixIcon: Icons.my_location_rounded,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: GlassTextField(
+                                controller: _lngController,
+                                labelText: "Longitude",
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                prefixIcon: Icons.explore_rounded,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        TextButton.icon(
+                          onPressed: _fetchCurrentLocation,
+                          icon: const Icon(Icons.gps_fixed_rounded, size: 16, color: Color(0xFF00E676)),
+                          label: Text(
+                            "Auto-detect GPS coordinates",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
                             ),
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Price Rate
-                  _buildLabel("Price Rate (₹ per kWh)"),
-                  const SizedBox(height: 8),
-                  GlassTextField(
-                    controller: _priceController,
-                    labelText: "Price Rate",
-                    hintText: "18",
-                    prefixIcon: Icons.currency_rupee_rounded,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: 28),
 
-                  // Publish Button
+                  // Submit Button
                   GlassButton(
-                    text: "PUBLISH CHARGING STATION",
+                    text: "PUBLISH CHARGER TO NETWORK",
                     isLoading: _isLoading,
                     icon: Icons.cloud_upload_rounded,
                     onPressed: _publishCharger,
@@ -390,38 +424,14 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 13,
+      title,
+      style: TextStyle(
+        fontSize: 15,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    );
-  }
-
-  Widget _buildTypeChip(String label, String type) {
-    final isSelected = _selectedChargerType == type;
-
-    return Expanded(
-      child: GlassContainer(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        borderRadius: BorderRadius.circular(18),
-        blur: 16,
-        opacity: isSelected ? 0.25 : 0.08,
-        borderColor: isSelected ? const Color(0xFF00E676) : Colors.white.withValues(alpha: 0.15),
-        onTap: () => setState(() => _selectedChargerType = type),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              color: isSelected ? const Color(0xFF00E676) : Colors.white70,
-            ),
-          ),
-        ),
+        color: isDark ? Colors.white : const Color(0xFF0F172A),
+        letterSpacing: 0.5,
       ),
     );
   }
