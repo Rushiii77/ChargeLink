@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/booking_model.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
@@ -88,7 +89,7 @@ class _BookingScreenState extends State<BookingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Please sign in to book a charger"),
-          backgroundColor: Colors.redAccent.shade700,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -115,7 +116,7 @@ class _BookingScreenState extends State<BookingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.errorMessage ?? "Payment failed or was declined."),
-          backgroundColor: Colors.redAccent.shade700,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -144,7 +145,7 @@ class _BookingScreenState extends State<BookingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Failed to complete booking: $e"),
-            backgroundColor: Colors.redAccent.shade700,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
@@ -162,10 +163,10 @@ class _BookingScreenState extends State<BookingScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
-          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.08)),
+          side: BorderSide(color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.15)),
         ),
         content: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -176,13 +177,13 @@ class _BookingScreenState extends State<BookingScreen> {
                 width: 76,
                 height: 76,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                  color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.accentLime.withValues(alpha: 0.4),
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF00E676), width: 1.5),
+                  border: Border.all(color: isDark ? AppColors.accentLime : AppColors.deepTeal, width: 1.5),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle_rounded,
-                  color: Color(0xFF00E676),
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                   size: 48,
                 ),
               ),
@@ -192,7 +193,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
               const SizedBox(height: 6),
@@ -201,7 +202,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 ),
               ),
               const SizedBox(height: 4),
@@ -209,7 +210,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 "Transaction: ${booking.transactionId}",
                 style: TextStyle(
                   fontSize: 11,
-                  color: isDark ? Colors.white.withValues(alpha: 0.5) : const Color(0xFF94A3B8),
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                 ),
               ),
               const SizedBox(height: 12),
@@ -249,17 +250,17 @@ class _BookingScreenState extends State<BookingScreen> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                         letterSpacing: 1.1,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       booking.otpPin,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 34,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF00E676),
+                        color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                         letterSpacing: 6,
                       ),
                     ),
@@ -309,7 +310,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         padding: EdgeInsets.zero,
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
                           size: 18,
                         ),
                         onPressed: () => Navigator.pop(context),
@@ -321,7 +322,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                   ],
@@ -390,7 +391,7 @@ class _BookingScreenState extends State<BookingScreen> {
       style: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.bold,
-        color: isDark ? Colors.white : const Color(0xFF0F172A),
+        color: isDark ? AppColors.darkText : AppColors.neutralDark,
         letterSpacing: 0.5,
       ),
     );
@@ -406,13 +407,13 @@ class _BookingScreenState extends State<BookingScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
+              color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.deepTeal.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.4)),
+              border: Border.all(color: AppColors.deepTeal.withValues(alpha: 0.35)),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.ev_station_rounded,
-              color: Color(0xFF00E676),
+              color: isDark ? AppColors.accentLime : AppColors.deepTeal,
               size: 28,
             ),
           ),
@@ -426,7 +427,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -434,7 +435,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   widget.charger.address,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -447,23 +448,23 @@ class _BookingScreenState extends State<BookingScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.15 : 0.12),
+                        color: AppColors.deepTeal.withValues(alpha: isDark ? 0.25 : 0.10),
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.3)),
+                        border: Border.all(color: AppColors.deepTeal.withValues(alpha: 0.3)),
                       ),
-                      child: const Text(
+                      child: Text(
                         "CCS2",
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF00B4D8),
+                          color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                         ),
                       ),
                     ),
@@ -499,8 +500,11 @@ class _BookingScreenState extends State<BookingScreen> {
             width: 68,
             margin: const EdgeInsets.only(right: 10),
             borderRadius: BorderRadius.circular(18),
-            borderColor: isSelected ? const Color(0xFF00E676) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
-            glowColor: isSelected ? const Color(0xFF00E676) : null,
+            borderColor: isSelected
+                ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
+            borderWidth: isSelected ? 1.6 : 1,
+            glowColor: isSelected ? AppColors.accentLime : null,
             onTap: () => setState(() => _selectedDate = d),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -511,8 +515,8 @@ class _BookingScreenState extends State<BookingScreen> {
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: isSelected
-                        ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                        : (isDark ? Colors.white60 : const Color(0xFF64748B)),
+                        ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                        : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -522,8 +526,8 @@ class _BookingScreenState extends State<BookingScreen> {
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: isSelected
-                        ? (isDark ? Colors.white : const Color(0xFF0F172A))
-                        : (isDark ? Colors.white.withValues(alpha: 0.8) : const Color(0xFF334155)),
+                        ? (isDark ? AppColors.darkText : AppColors.neutralDark)
+                        : (isDark ? AppColors.darkText.withValues(alpha: 0.8) : AppColors.neutral),
                   ),
                 ),
               ],
@@ -546,7 +550,10 @@ class _BookingScreenState extends State<BookingScreen> {
           tier: GlassTier.tertiary,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           borderRadius: BorderRadius.circular(14),
-          borderColor: isSelected ? const Color(0xFF00E676) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+          borderColor: isSelected
+              ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+              : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
+          borderWidth: isSelected ? 1.5 : 1,
           onTap: () => setState(() => _selectedSlotIndex = index),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -555,8 +562,8 @@ class _BookingScreenState extends State<BookingScreen> {
                 Icons.access_time_rounded,
                 size: 13,
                 color: isSelected
-                    ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                    : (isDark ? Colors.white60 : const Color(0xFF64748B)),
+                    ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                    : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
               ),
               const SizedBox(width: 6),
               Text(
@@ -565,8 +572,8 @@ class _BookingScreenState extends State<BookingScreen> {
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   color: isSelected
-                      ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                      : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                      ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                      : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
                 ),
               ),
             ],
@@ -591,19 +598,23 @@ class _BookingScreenState extends State<BookingScreen> {
               label: Text(label),
               selected: isSelected,
               onSelected: (_) => setState(() => _selectedDurationMinutes = mins),
-              selectedColor: const Color(0xFF00E676).withValues(alpha: isDark ? 0.25 : 0.2),
-              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+              selectedColor: isDark
+                  ? AppColors.deepTeal.withValues(alpha: 0.40)
+                  : AppColors.accentLime.withValues(alpha: 0.35),
+              backgroundColor: isDark ? AppColors.darkCard : AppColors.white.withValues(alpha: 0.7),
               labelStyle: TextStyle(
                 color: isSelected
-                    ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                    : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                    ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                    : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 fontSize: 12,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                  color: isSelected ? const Color(0xFF00E676) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                  color: isSelected
+                      ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                      : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
                 ),
               ),
             ),
@@ -629,7 +640,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                 ),
               ),
               Text(
@@ -637,16 +648,18 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 ),
               ),
             ],
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: const Color(0xFF00E676),
-              inactiveTrackColor: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.1),
-              thumbColor: const Color(0xFF00E676),
+              activeTrackColor: AppColors.deepTeal,
+              inactiveTrackColor: isDark
+                  ? AppColors.neutral.withValues(alpha: 0.25)
+                  : AppColors.neutral.withValues(alpha: 0.15),
+              thumbColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
             ),
             child: Slider(
               value: _targetBattery,
@@ -659,18 +672,20 @@ class _BookingScreenState extends State<BookingScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.03),
+              color: isDark ? AppColors.darkCard.withValues(alpha: 0.6) : AppColors.lightBg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06)),
+              border: Border.all(
+                color: isDark ? AppColors.neutral.withValues(alpha: 0.15) : AppColors.neutral.withValues(alpha: 0.10),
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.bolt_rounded, size: 16, color: Color(0xFFFFB300)),
+                Icon(Icons.bolt_rounded, size: 16, color: isDark ? AppColors.accentLime : AppColors.deepTeal),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     "Est. ~${_estimatedEnergyKwh.toStringAsFixed(1)} kWh delivered in $_selectedDurationMinutes mins.",
-                    style: TextStyle(fontSize: 12, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                    style: TextStyle(fontSize: 12, color: isDark ? AppColors.darkText : AppColors.neutralDark),
                   ),
                 ),
               ],
@@ -694,7 +709,7 @@ class _BookingScreenState extends State<BookingScreen> {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              color: isDark ? AppColors.darkText : AppColors.neutralDark,
             ),
           ),
           const SizedBox(height: 12),
@@ -705,7 +720,7 @@ class _BookingScreenState extends State<BookingScreen> {
           _buildFareRow("Estimated Energy Consumed", "~${_estimatedEnergyKwh.toStringAsFixed(1)} kWh (~₹${_estimatedTotalCharge.toStringAsFixed(0)})", isDark),
           const SizedBox(height: 6),
           _buildFareRow("Escrow Security & Platform Fee", "FREE (₹0)", isDark),
-          Divider(height: 24, color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+          Divider(height: 24, color: isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -717,14 +732,14 @@ class _BookingScreenState extends State<BookingScreen> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: isDark ? AppColors.darkText : AppColors.neutralDark,
                     ),
                   ),
                   Text(
                     "100% Refundable Deposit",
                     style: TextStyle(
                       fontSize: 11,
-                      color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                     ),
                   ),
                 ],
@@ -734,7 +749,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 ),
               ),
             ],
@@ -753,8 +768,8 @@ class _BookingScreenState extends State<BookingScreen> {
           style: TextStyle(
             fontSize: 13,
             color: isHighlight
-                ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                : (isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B)),
+                ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
             fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -764,8 +779,8 @@ class _BookingScreenState extends State<BookingScreen> {
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: isHighlight
-                ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                : (isDark ? Colors.white : const Color(0xFF0F172A)),
+                ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                : (isDark ? AppColors.darkText : AppColors.neutralDark),
           ),
         ),
       ],

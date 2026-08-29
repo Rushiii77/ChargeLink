@@ -1,113 +1,134 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import '../../services/theme_service.dart';
 
-class GlassTextField extends StatelessWidget {
-  final TextEditingController? controller;
+class GlassTextField extends StatefulWidget {
+  final TextEditingController controller;
   final String labelText;
   final String? hintText;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
-  final TextInputType keyboardType;
-  final TextInputAction textInputAction;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
   final ValueChanged<String>? onFieldSubmitted;
   final FormFieldValidator<String>? validator;
-  final bool readOnly;
-  final VoidCallback? onTap;
 
   const GlassTextField({
     super.key,
-    this.controller,
+    required this.controller,
     required this.labelText,
     this.hintText,
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
-    this.keyboardType = TextInputType.text,
-    this.textInputAction = TextInputAction.next,
+    this.keyboardType,
+    this.textInputAction,
     this.onFieldSubmitted,
     this.validator,
-    this.readOnly = false,
-    this.onTap,
   });
+
+  @override
+  State<GlassTextField> createState() => _GlassTextFieldState();
+}
+
+class _GlassTextFieldState extends State<GlassTextField> {
+  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.isDark(context);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.white.withValues(alpha: 0.85),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.16)
-                  : Colors.black.withValues(alpha: 0.08),
-              width: 1.0,
-            ),
-          ),
-          child: TextFormField(
-            controller: controller,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            textInputAction: textInputAction,
-            onFieldSubmitted: onFieldSubmitted,
-            validator: validator,
-            readOnly: readOnly,
-            onTap: onTap,
-            style: TextStyle(
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-            cursorColor: const Color(0xFF00E676),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.transparent,
-              labelText: labelText,
-              hintText: hintText,
-              labelStyle: TextStyle(
-                color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
-                fontSize: 14,
+    return Focus(
+      onFocusChange: (focused) => setState(() => _isFocused = focused),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            if (_isFocused)
+              BoxShadow(
+                color: AppColors.deepTeal.withValues(alpha: isDark ? 0.35 : 0.18),
+                blurRadius: 12,
+                offset: const Offset(0, 2),
               ),
-              hintStyle: TextStyle(
-                color: isDark ? Colors.white.withValues(alpha: 0.4) : const Color(0xFF94A3B8),
-                fontSize: 13,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: TextFormField(
+              controller: widget.controller,
+              obscureText: widget.obscureText,
+              keyboardType: widget.keyboardType,
+              textInputAction: widget.textInputAction,
+              onFieldSubmitted: widget.onFieldSubmitted,
+              validator: widget.validator,
+              style: TextStyle(
+                color: isDark ? AppColors.darkText : AppColors.neutralDark,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
               ),
-              prefixIcon: prefixIcon != null
-                  ? Icon(
-                      prefixIcon,
-                      color: const Color(0xFF00E676),
-                      size: 20,
-                    )
-                  : null,
-              suffixIcon: suffixIcon,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(
-                  color: Color(0xFF00E676),
-                  width: 1.8,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: isDark
+                    ? AppColors.darkCard.withValues(alpha: _isFocused ? 0.75 : 0.50)
+                    : AppColors.white.withValues(alpha: _isFocused ? 0.95 : 0.85),
+                labelText: widget.labelText,
+                labelStyle: TextStyle(
+                  color: _isFocused
+                      ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                      : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
+                  fontSize: 14,
+                  fontWeight: _isFocused ? FontWeight.bold : FontWeight.w500,
                 ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: Colors.redAccent.shade200,
-                  width: 1.5,
+                hintText: widget.hintText,
+                hintStyle: TextStyle(
+                  color: isDark ? AppColors.neutral : AppColors.neutral.withValues(alpha: 0.6),
+                  fontSize: 13,
                 ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 16,
+                prefixIcon: widget.prefixIcon != null
+                    ? Icon(
+                        widget.prefixIcon,
+                        color: _isFocused
+                            ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                            : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
+                        size: 20,
+                      )
+                    : null,
+                suffixIcon: widget.suffixIcon,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? AppColors.deepTeal.withValues(alpha: 0.3)
+                        : AppColors.neutral.withValues(alpha: 0.2),
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: isDark ? AppColors.accentLime : AppColors.deepTeal,
+                    width: 1.8,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: AppColors.error,
+                    width: 1.2,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: AppColors.error,
+                    width: 1.8,
+                  ),
+                ),
               ),
             ),
           ),

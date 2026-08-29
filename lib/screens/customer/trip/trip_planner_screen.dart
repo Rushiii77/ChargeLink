@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
@@ -58,7 +59,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         padding: EdgeInsets.zero,
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
                           size: 18,
                         ),
                         onPressed: () => Navigator.pop(context),
@@ -70,7 +71,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                   ],
@@ -118,7 +119,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              color: isDark ? AppColors.darkText : AppColors.neutralDark,
                             ),
                           ),
                           Text(
@@ -126,18 +127,18 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                              color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                             ),
                           ),
                         ],
                       ),
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: const Color(0xFF00E676),
+                          activeTrackColor: AppColors.deepTeal,
                           inactiveTrackColor: isDark
-                              ? Colors.white.withValues(alpha: 0.15)
-                              : Colors.black.withValues(alpha: 0.1),
-                          thumbColor: const Color(0xFF00E676),
+                              ? AppColors.neutral.withValues(alpha: 0.25)
+                              : AppColors.neutral.withValues(alpha: 0.15),
+                          thumbColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
                         ),
                         child: Slider(
                           value: _currentBattery,
@@ -166,13 +167,13 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         Container(
                           width: 1,
                           height: 36,
-                          color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08),
+                          color: isDark ? AppColors.neutral.withValues(alpha: 0.25) : AppColors.neutral.withValues(alpha: 0.15),
                         ),
                         _tripMetric("Est. Duration", "2 hrs 40m", Icons.timer_rounded, isDark),
                         Container(
                           width: 1,
                           height: 36,
-                          color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08),
+                          color: isDark ? AppColors.neutral.withValues(alpha: 0.25) : AppColors.neutral.withValues(alpha: 0.15),
                         ),
                         _tripMetric("Stops Needed", needsChargingStop ? "1 Stop" : "0 Stops", Icons.ev_station_rounded, isDark),
                       ],
@@ -186,7 +187,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: isDark ? AppColors.darkText : AppColors.neutralDark,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -219,17 +220,17 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       tier: GlassTier.secondary,
                       padding: const EdgeInsets.all(20),
                       borderRadius: BorderRadius.circular(20),
-                      borderColor: const Color(0xFF00E676).withValues(alpha: 0.4),
+                      borderColor: AppColors.deepTeal.withValues(alpha: 0.35),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676), size: 28),
+                          Icon(Icons.check_circle_rounded, color: isDark ? AppColors.accentLime : AppColors.deepTeal, size: 28),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Text(
                               "You have enough battery to reach your destination without stopping!",
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                color: isDark ? AppColors.darkText : AppColors.neutralDark,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -252,14 +253,14 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   Widget _tripMetric(String label, String val, IconData icon, bool isDark) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: const Color(0xFF00E676)),
+        Icon(icon, size: 20, color: isDark ? AppColors.accentLime : AppColors.deepTeal),
         const SizedBox(height: 6),
         Text(
           val,
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            color: isDark ? AppColors.darkText : AppColors.neutralDark,
           ),
         ),
         const SizedBox(height: 2),
@@ -267,7 +268,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
           ),
         ),
       ],
@@ -296,14 +297,18 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               Container(
                 width: 28,
                 height: 28,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF00E676),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
                   child: Text(
                     stopNumber,
-                    style: const TextStyle(color: Color(0xFF0B132B), fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(
+                      color: isDark ? AppColors.neutralDark : Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ),
@@ -314,23 +319,29 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
+                  color: isDark
+                      ? AppColors.deepTeal.withValues(alpha: 0.35)
+                      : AppColors.accentLime.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.4)),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.accentLime.withValues(alpha: 0.5)
+                        : AppColors.deepTeal.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Text(
                   suggestedDuration,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                    color: isDark ? AppColors.accentLime : AppColors.primaryDark,
                   ),
                 ),
               ),
@@ -342,7 +353,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             address,
             style: TextStyle(
               fontSize: 12,
-              color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+              color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
             ),
           ),
 
@@ -351,22 +362,22 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.03),
+              color: isDark ? AppColors.darkCard.withValues(alpha: 0.6) : AppColors.lightBg,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06),
+                color: isDark ? AppColors.neutral.withValues(alpha: 0.15) : AppColors.neutral.withValues(alpha: 0.10),
               ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.bolt_rounded, size: 16, color: Color(0xFFFFB300)),
+                Icon(Icons.bolt_rounded, size: 16, color: isDark ? AppColors.accentLime : AppColors.deepTeal),
                 const SizedBox(width: 6),
                 Text(
                   "$power • $targetCharge",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
               ],

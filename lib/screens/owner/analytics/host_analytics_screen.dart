@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/booking_model.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
@@ -21,7 +22,7 @@ class HostAnalyticsScreen extends StatelessWidget {
     if (user == null) {
       return Scaffold(
         body: Center(
-          child: Text("Please login first", style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A))),
+          child: Text("Please login first", style: TextStyle(color: isDark ? AppColors.darkText : AppColors.neutralDark)),
         ),
       );
     }
@@ -74,7 +75,7 @@ class HostAnalyticsScreen extends StatelessWidget {
                                 padding: EdgeInsets.zero,
                                 icon: Icon(
                                   Icons.arrow_back_ios_new_rounded,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                                   size: 18,
                                 ),
                                 onPressed: () => Navigator.pop(context),
@@ -86,7 +87,7 @@ class HostAnalyticsScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                color: isDark ? AppColors.darkText : AppColors.neutralDark,
                               ),
                             ),
                           ],
@@ -99,8 +100,8 @@ class HostAnalyticsScreen extends StatelessWidget {
                           tier: GlassTier.primary,
                           padding: const EdgeInsets.all(22),
                           borderRadius: BorderRadius.circular(28),
-                          glowColor: const Color(0xFF00E676),
-                          glowSpread: 2,
+                          glowColor: AppColors.accentLime,
+                          glowSpread: 1,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -112,25 +113,27 @@ class HostAnalyticsScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                                      color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                                     ),
                                   ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
+                                      color: isDark
+                                          ? AppColors.deepTeal.withValues(alpha: 0.35)
+                                          : AppColors.accentLime.withValues(alpha: 0.35),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.trending_up_rounded, size: 14, color: Color(0xFF00E676)),
+                                        Icon(Icons.trending_up_rounded, size: 14, color: isDark ? AppColors.accentLime : AppColors.deepTeal),
                                         const SizedBox(width: 4),
                                         Text(
                                           "+18.4%",
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.bold,
-                                            color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                                            color: isDark ? AppColors.accentLime : AppColors.primaryDark,
                                           ),
                                         ),
                                       ],
@@ -144,14 +147,14 @@ class HostAnalyticsScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 36,
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                                   letterSpacing: 0.5,
                                 ),
                               ),
                               const SizedBox(height: 16),
                               Divider(
                                 height: 1,
-                                color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08),
+                                color: isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12),
                               ),
                               const SizedBox(height: 16),
                               Row(
@@ -173,7 +176,7 @@ class HostAnalyticsScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            color: isDark ? AppColors.darkText : AppColors.neutralDark,
                           ),
                         ),
 
@@ -187,7 +190,7 @@ class HostAnalyticsScreen extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 "No stations listed yet to track analytics.",
-                                style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B)),
+                                style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral),
                               ),
                             ),
                           )
@@ -209,10 +212,10 @@ class HostAnalyticsScreen extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.all(10),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.15 : 0.1),
+                                      color: AppColors.deepTeal.withValues(alpha: isDark ? 0.35 : 0.10),
                                       borderRadius: BorderRadius.circular(14),
                                     ),
-                                    child: const Icon(Icons.ev_station_rounded, color: Color(0xFF00E676), size: 22),
+                                    child: Icon(Icons.ev_station_rounded, color: isDark ? AppColors.accentLime : AppColors.deepTeal, size: 22),
                                   ),
                                   const SizedBox(width: 14),
                                   Expanded(
@@ -224,14 +227,14 @@ class HostAnalyticsScreen extends StatelessWidget {
                                           style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
-                                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                            color: isDark ? AppColors.darkText : AppColors.neutralDark,
                                           ),
                                         ),
                                         Text(
                                           "${stationBookings.length} total bookings",
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                                            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                                           ),
                                         ),
                                       ],
@@ -242,7 +245,7 @@ class HostAnalyticsScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                                      color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                                     ),
                                   ),
                                 ],
@@ -269,7 +272,7 @@ class HostAnalyticsScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 11, color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B)),
+          style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkTextSecondary : AppColors.neutral),
         ),
         const SizedBox(height: 3),
         Text(
@@ -277,7 +280,7 @@ class HostAnalyticsScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            color: isDark ? AppColors.darkText : AppColors.neutralDark,
           ),
         ),
       ],

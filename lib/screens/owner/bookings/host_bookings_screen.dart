@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/booking_model.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
@@ -43,14 +44,14 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
-          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.08)),
+          side: BorderSide(color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.15)),
         ),
         title: Text(
           "Verify Check-in PIN",
-          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontWeight: FontWeight.bold),
+          style: TextStyle(color: isDark ? AppColors.darkText : AppColors.neutralDark, fontWeight: FontWeight.bold),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -58,7 +59,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
           children: [
             Text(
               "Ask driver for the 4-digit PIN generated for ${booking.chargerName}.",
-              style: TextStyle(fontSize: 13, color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B)),
+              style: TextStyle(fontSize: 13, color: isDark ? AppColors.darkTextSecondary : AppColors.neutral),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -66,21 +67,25 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
               keyboardType: TextInputType.number,
               maxLength: 4,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 8,
-                color: Color(0xFF00E676),
+                color: isDark ? AppColors.accentLime : AppColors.deepTeal,
               ),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                fillColor: isDark ? AppColors.darkCard : AppColors.lightBg,
                 counterText: "",
                 hintText: "••••",
-                hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black26),
+                hintStyle: TextStyle(color: isDark ? AppColors.neutral : AppColors.neutral.withValues(alpha: 0.5)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
-                  borderSide: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.08)),
+                  borderSide: BorderSide(color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.15)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide(color: isDark ? AppColors.accentLime : AppColors.deepTeal, width: 2),
                 ),
               ),
             ),
@@ -89,12 +94,12 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text("Cancel", style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B))),
+            child: Text("Cancel", style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00E676),
-              foregroundColor: const Color(0xFF0B132B),
+              backgroundColor: AppColors.deepTeal,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             onPressed: () async {
@@ -106,7 +111,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("✓ PIN Verified! Charging session activated for ${booking.chargerName}."),
-                    backgroundColor: const Color(0xFF00E676),
+                    backgroundColor: AppColors.deepTeal,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
@@ -115,7 +120,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: const Text("Invalid PIN entered. Please check with driver."),
-                    backgroundColor: Colors.redAccent.shade700,
+                    backgroundColor: AppColors.error,
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
@@ -134,28 +139,28 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+          side: BorderSide(color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.15)),
         ),
         title: Text(
           "Complete Session?",
-          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontWeight: FontWeight.bold),
+          style: TextStyle(color: isDark ? AppColors.darkText : AppColors.neutralDark, fontWeight: FontWeight.bold),
         ),
         content: Text(
           "Mark charging session as completed and settle payment?",
-          style: TextStyle(color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B)),
+          style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text("Cancel", style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B))),
+            child: Text("Cancel", style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00E676),
-              foregroundColor: const Color(0xFF0B132B),
+              backgroundColor: AppColors.deepTeal,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.pop(ctx, true),
@@ -171,7 +176,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Session completed! ₹${booking.totalAmount.toStringAsFixed(0)} settled."),
-          backgroundColor: const Color(0xFF00E676),
+          backgroundColor: AppColors.deepTeal,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -186,7 +191,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
     if (user == null) {
       return Scaffold(
         body: Center(
-          child: Text("Please login first", style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A))),
+          child: Text("Please login first", style: TextStyle(color: isDark ? AppColors.darkText : AppColors.neutralDark)),
         ),
       );
     }
@@ -242,7 +247,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                                 padding: EdgeInsets.zero,
                                 icon: Icon(
                                   Icons.arrow_back_ios_new_rounded,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                                   size: 18,
                                 ),
                                 onPressed: () => Navigator.pop(context),
@@ -254,7 +259,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                color: isDark ? AppColors.darkText : AppColors.neutralDark,
                               ),
                             ),
                           ],
@@ -271,11 +276,11 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                           child: TabBar(
                             controller: _tabController,
                             indicator: BoxDecoration(
-                              color: const Color(0xFF00E676),
+                              color: AppColors.deepTeal,
                               borderRadius: BorderRadius.circular(14),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF00E676).withValues(alpha: 0.3),
+                                  color: AppColors.deepTeal.withValues(alpha: 0.25),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
@@ -283,8 +288,8 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                             ),
                             indicatorSize: TabBarIndicatorSize.tab,
                             dividerColor: Colors.transparent,
-                            labelColor: const Color(0xFF0B132B),
-                            unselectedLabelColor: isDark ? Colors.white60 : const Color(0xFF64748B),
+                            labelColor: isDark ? AppColors.accentLime : Colors.white,
+                            unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                             labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                             tabs: [
                               Tab(text: "Incoming (${incoming.length})"),
@@ -328,13 +333,13 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                color: isDark ? AppColors.darkCard : AppColors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.event_available_rounded,
                 size: 40,
-                color: Color(0xFF00E676),
+                color: isDark ? AppColors.accentLime : AppColors.deepTeal,
               ),
             ),
             const SizedBox(height: 16),
@@ -343,7 +348,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? AppColors.darkText : AppColors.neutralDark,
               ),
             ),
           ],
@@ -364,19 +369,19 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
 
     switch (booking.status.toLowerCase()) {
       case 'confirmed':
-        statusColor = const Color(0xFF00E676);
+        statusColor = isDark ? AppColors.accentLime : AppColors.deepTeal;
         break;
       case 'active':
-        statusColor = const Color(0xFF00E5FF);
+        statusColor = AppColors.primaryLight;
         break;
       case 'completed':
-        statusColor = isDark ? Colors.white60 : const Color(0xFF64748B);
+        statusColor = isDark ? AppColors.darkTextSecondary : AppColors.neutral;
         break;
       case 'cancelled':
-        statusColor = Colors.redAccent.shade200;
+        statusColor = AppColors.error;
         break;
       default:
-        statusColor = isDark ? Colors.white60 : const Color(0xFF64748B);
+        statusColor = isDark ? AppColors.darkTextSecondary : AppColors.neutral;
     }
 
     final dateStr =
@@ -390,7 +395,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
       tier: GlassTier.secondary,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -402,16 +407,16 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: isDark ? 0.15 : 0.12),
+                  color: statusColor.withValues(alpha: isDark ? 0.20 : 0.12),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.35)),
                 ),
                 child: Text(
                   booking.formattedStatus,
@@ -430,14 +435,14 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
             "$dateStr • $startTimeStr - $endTimeStr (${booking.durationMinutes} mins)",
             style: TextStyle(
               fontSize: 12,
-              color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+              color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
             ),
           ),
 
           const SizedBox(height: 12),
           Divider(
             height: 1,
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
+            color: isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12),
           ),
           const SizedBox(height: 12),
 
@@ -448,7 +453,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
               const Spacer(),
@@ -457,7 +462,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 ),
               ),
             ],
@@ -478,7 +483,7 @@ class _HostBookingsScreenState extends State<HostBookingsScreen>
               text: "COMPLETE & SETTLE CHARGING",
               icon: Icons.check_circle_rounded,
               height: 48,
-              color: const Color(0xFF00E5FF),
+              variant: GlassButtonVariant.accent,
               onPressed: () => _completeSession(booking),
             ),
           ],

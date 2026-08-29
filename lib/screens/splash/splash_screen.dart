@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
+import '../../services/theme_service.dart';
 import '../../widgets/glass/glass_background.dart';
 import '../../widgets/glass/glass_container.dart';
 
@@ -47,6 +49,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDark(context);
+
     return Scaffold(
       body: GlassBackground(
         child: SafeArea(
@@ -64,28 +68,26 @@ class _SplashScreenState extends State<SplashScreen>
                       width: 140,
                       height: 140,
                       borderRadius: BorderRadius.circular(36),
-                      glowColor: const Color(0xFF00E676),
-                      glowSpread: 4,
+                      glowColor: AppColors.accentLime,
+                      glowSpread: 2,
                       child: Center(
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF00E676), Color(0xFF00E5FF)],
-                            ),
+                            color: isDark ? AppColors.deepTeal : AppColors.accentLime,
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF00E676).withValues(alpha: 0.4),
+                                color: AppColors.deepTeal.withValues(alpha: 0.3),
                                 blurRadius: 16,
                                 spreadRadius: 2,
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.ev_station_rounded,
                             size: 48,
-                            color: Color(0xFF0B132B),
+                            color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                           ),
                         ),
                       ),
@@ -93,19 +95,13 @@ class _SplashScreenState extends State<SplashScreen>
 
                     const SizedBox(height: 36),
 
-                    const Text(
+                    Text(
                       "ChargeLink",
                       style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Color(0xFF00E676),
-                            blurRadius: 20,
-                          ),
-                        ],
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
 
@@ -114,16 +110,20 @@ class _SplashScreenState extends State<SplashScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.08),
+                        color: isDark
+                            ? AppColors.deepTeal.withValues(alpha: 0.35)
+                            : AppColors.accentLime.withValues(alpha: 0.40),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                        border: Border.all(
+                          color: isDark ? AppColors.accentLime.withValues(alpha: 0.4) : AppColors.deepTeal.withValues(alpha: 0.25),
+                        ),
                       ),
                       child: Text(
                         "Smart EV Charging & Mobility Network",
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? AppColors.accentLime : AppColors.primaryDark,
                         ),
                       ),
                     ),
@@ -131,22 +131,24 @@ class _SplashScreenState extends State<SplashScreen>
                     const SizedBox(height: 80),
 
                     // Crystal Spinner
-                    const SizedBox(
+                    SizedBox(
                       width: 28,
                       height: 28,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00E676)),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          isDark ? AppColors.accentLime : AppColors.deepTeal,
+                        ),
                       ),
                     ),
 
                     const SizedBox(height: 14),
 
                     Text(
-                      "Initializing quantum grid...",
+                      "Connecting to smart charging grid...",
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                         letterSpacing: 0.5,
                       ),
                     ),

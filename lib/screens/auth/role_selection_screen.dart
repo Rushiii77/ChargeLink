@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../../services/theme_service.dart';
 import '../../widgets/glass/glass_background.dart';
@@ -43,7 +44,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Failed to save role. Please try again.'),
-            backgroundColor: Colors.redAccent.shade700,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
@@ -76,7 +77,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   child: Text(
                     "STEP 2 OF 2",
                     style: TextStyle(
-                      color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                      color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.1,
@@ -91,7 +92,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -102,7 +103,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   "Select how you plan to use ChargeLink. You can switch or add roles anytime in settings.",
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                     height: 1.4,
                   ),
                 ),
@@ -115,7 +116,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   title: 'EV Driver / Customer',
                   description: 'Discover nearby chargers, check live occupancy, and reserve charging slots seamlessly.',
                   icon: Icons.electric_car_rounded,
-                  iconColor: const Color(0xFF00E676),
+                  iconColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
                   isDark: isDark,
                 ),
 
@@ -127,7 +128,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   title: 'Station Host / Owner',
                   description: 'List your private or commercial charging station, manage pricing, and earn revenue.',
                   icon: Icons.ev_station_rounded,
-                  iconColor: const Color(0xFF00E5FF),
+                  iconColor: AppColors.primaryLight,
                   isDark: isDark,
                 ),
 
@@ -165,11 +166,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       padding: const EdgeInsets.all(20),
       borderRadius: BorderRadius.circular(24),
       borderColor: isSelected
-          ? const Color(0xFF00E676)
-          : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+          ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+          : (isDark ? AppColors.neutral.withValues(alpha: 0.15) : AppColors.neutral.withValues(alpha: 0.10)),
       borderWidth: isSelected ? 2.0 : 1.0,
-      glowColor: isSelected ? const Color(0xFF00E676) : null,
-      glowSpread: isSelected ? 2 : 0,
+      glowColor: isSelected ? AppColors.accentLime : null,
+      glowSpread: isSelected ? 1 : 0,
       onTap: () => setState(() => selectedRole = roleValue),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +178,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: isDark ? 0.18 : 0.12),
+              color: iconColor.withValues(alpha: isDark ? 0.20 : 0.10),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: isSelected ? iconColor : iconColor.withValues(alpha: 0.3),
@@ -198,7 +199,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -206,7 +207,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                     height: 1.35,
                   ),
                 ),
@@ -221,14 +222,14 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
             height: 24,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isSelected ? const Color(0xFF00E676) : Colors.transparent,
+              color: isSelected ? (isDark ? AppColors.accentLime : AppColors.deepTeal) : Colors.transparent,
               border: Border.all(
-                color: isSelected ? const Color(0xFF00E676) : (isDark ? Colors.white38 : Colors.black26),
+                color: isSelected ? (isDark ? AppColors.accentLime : AppColors.deepTeal) : (isDark ? AppColors.neutral.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.2)),
                 width: 2,
               ),
             ),
             child: isSelected
-                ? const Icon(Icons.check, size: 14, color: Color(0xFF0B132B))
+                ? Icon(Icons.check, size: 14, color: isDark ? AppColors.neutralDark : Colors.white)
                 : null,
           ),
         ],

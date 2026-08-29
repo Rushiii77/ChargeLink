@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/booking_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/booking_service.dart';
@@ -50,7 +51,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.15),
+                  color: isDark ? Colors.white.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -59,13 +60,13 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.15 : 0.12),
+                color: isDark ? AppColors.deepTeal.withValues(alpha: 0.35) : AppColors.accentLime.withValues(alpha: 0.40),
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF00E676), width: 1.2),
+                border: Border.all(color: isDark ? AppColors.accentLime : AppColors.deepTeal, width: 1.2),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.qr_code_scanner_rounded,
-                color: Color(0xFF00E676),
+                color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 size: 36,
               ),
             ),
@@ -75,7 +76,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? AppColors.darkText : AppColors.neutralDark,
               ),
             ),
             const SizedBox(height: 4),
@@ -84,7 +85,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
               ),
             ),
             const SizedBox(height: 24),
@@ -96,10 +97,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               child: Center(
                 child: Text(
                   booking.otpPin,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 38,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF00E676),
+                    color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                     letterSpacing: 8,
                   ),
                 ),
@@ -122,22 +123,22 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+          side: BorderSide(color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.15)),
         ),
         title: Text(
           "Cancel Reservation?",
           style: TextStyle(
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            color: isDark ? AppColors.darkText : AppColors.neutralDark,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           "Are you sure you want to cancel your slot at ${booking.chargerName}? Your ₹100 deposit will be refunded automatically.",
           style: TextStyle(
-            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF475569),
+            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
             fontSize: 13,
           ),
         ),
@@ -146,12 +147,12 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
               "Keep Slot",
-              style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B)),
+              style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral),
             ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent.shade400,
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -187,7 +188,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
         body: Center(
           child: Text(
             "Please sign in to view your bookings",
-            style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A)),
+            style: TextStyle(color: isDark ? AppColors.darkText : AppColors.neutralDark),
           ),
         ),
       );
@@ -212,7 +213,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                         padding: EdgeInsets.zero,
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
                           size: 18,
                         ),
                         onPressed: () => Navigator.pop(context),
@@ -224,7 +225,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                   ],
@@ -241,11 +242,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                   child: TabBar(
                     controller: _tabController,
                     indicator: BoxDecoration(
-                      color: const Color(0xFF00E676),
+                      color: AppColors.deepTeal,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF00E676).withValues(alpha: 0.3),
+                          color: AppColors.deepTeal.withValues(alpha: 0.25),
                           blurRadius: 10,
                           offset: const Offset(0, 2),
                         ),
@@ -253,8 +254,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
                     dividerColor: Colors.transparent,
-                    labelColor: const Color(0xFF0B132B),
-                    unselectedLabelColor: isDark ? Colors.white60 : const Color(0xFF64748B),
+                    labelColor: isDark ? AppColors.accentLime : Colors.white,
+                    unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                     labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     tabs: const [
                       Tab(text: "Upcoming"),
@@ -274,7 +275,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
-                        child: CircularProgressIndicator(color: Color(0xFF00E676)),
+                        child: CircularProgressIndicator(color: AppColors.deepTeal),
                       );
                     }
 
@@ -321,13 +322,13 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
+                color: isDark ? AppColors.darkCard : AppColors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.calendar_month_outlined,
                 size: 40,
-                color: Color(0xFF00E676),
+                color: isDark ? AppColors.accentLime : AppColors.deepTeal,
               ),
             ),
             const SizedBox(height: 16),
@@ -336,7 +337,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? AppColors.darkText : AppColors.neutralDark,
               ),
             ),
             const SizedBox(height: 6),
@@ -344,7 +345,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               "Explore stations on the map to reserve.",
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
               ),
             ),
           ],
@@ -365,19 +366,19 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
 
     switch (booking.status.toLowerCase()) {
       case 'confirmed':
-        statusColor = const Color(0xFF00E676);
+        statusColor = isDark ? AppColors.accentLime : AppColors.deepTeal;
         break;
       case 'active':
-        statusColor = const Color(0xFF00E5FF);
+        statusColor = AppColors.primaryLight;
         break;
       case 'completed':
-        statusColor = isDark ? Colors.white60 : const Color(0xFF64748B);
+        statusColor = isDark ? AppColors.darkTextSecondary : AppColors.neutral;
         break;
       case 'cancelled':
-        statusColor = Colors.redAccent.shade200;
+        statusColor = AppColors.error;
         break;
       default:
-        statusColor = isDark ? Colors.white60 : const Color(0xFF64748B);
+        statusColor = isDark ? AppColors.darkTextSecondary : AppColors.neutral;
     }
 
     final dateStr =
@@ -391,7 +392,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
       tier: GlassTier.secondary,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -404,16 +405,16 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: isDark ? 0.15 : 0.12),
+                  color: statusColor.withValues(alpha: isDark ? 0.20 : 0.12),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.35)),
                 ),
                 child: Text(
                   booking.formattedStatus,
@@ -433,7 +434,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
             booking.chargerAddress,
             style: TextStyle(
               fontSize: 12,
-              color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+              color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -442,7 +443,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
           const SizedBox(height: 12),
           Divider(
             height: 1,
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
+            color: isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12),
           ),
           const SizedBox(height: 12),
 
@@ -452,7 +453,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               Icon(
                 Icons.calendar_today_rounded,
                 size: 14,
-                color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
               ),
               const SizedBox(width: 6),
               Text(
@@ -460,14 +461,14 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
               const SizedBox(width: 14),
               Icon(
                 Icons.access_time_rounded,
                 size: 14,
-                color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
               ),
               const SizedBox(width: 6),
               Text(
@@ -475,7 +476,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
             ],
@@ -489,16 +490,16 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.15 : 0.12),
+                  color: AppColors.deepTeal.withValues(alpha: isDark ? 0.25 : 0.10),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.3)),
+                  border: Border.all(color: AppColors.deepTeal.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   "${booking.powerKw.toInt()} kW ${booking.connectorType}",
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                    color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                   ),
                 ),
               ),
@@ -506,16 +507,16 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.15 : 0.12),
+                  color: isDark ? AppColors.deepTeal.withValues(alpha: 0.35) : AppColors.accentLime.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.3)),
+                  border: Border.all(color: isDark ? AppColors.accentLime.withValues(alpha: 0.5) : AppColors.deepTeal.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   "Paid ₹${booking.bookingFee.toStringAsFixed(0)}",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF00B4D8),
+                    color: isDark ? AppColors.accentLime : AppColors.primaryDark,
                   ),
                 ),
               ),
@@ -525,7 +526,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
             ],
@@ -538,8 +539,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                 Expanded(
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF00E676),
-                      side: const BorderSide(color: Color(0xFF00E676)),
+                      foregroundColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
+                      side: BorderSide(color: isDark ? AppColors.accentLime : AppColors.deepTeal),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -555,7 +556,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                 ),
                 const SizedBox(width: 10),
                 IconButton(
-                  icon: Icon(Icons.close_rounded, color: Colors.redAccent.shade200),
+                  icon: const Icon(Icons.close_rounded, color: AppColors.error),
                   tooltip: "Cancel Booking",
                   onPressed: () => _cancelBooking(booking),
                 ),

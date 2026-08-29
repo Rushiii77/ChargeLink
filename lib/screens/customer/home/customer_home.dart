@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/map_styles.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
@@ -119,9 +120,8 @@ class _CustomerHomeState extends State<CustomerHome> {
       }
 
       if (_filter.connectorType != 'All' &&
-          !charger.connectorType
-              .toUpperCase()
-              .contains(_filter.connectorType.toUpperCase())) {
+          charger.connectorType.toUpperCase() !=
+              _filter.connectorType.toUpperCase()) {
         return false;
       }
 
@@ -130,31 +130,30 @@ class _CustomerHomeState extends State<CustomerHome> {
       }
 
       if (_searchQuery.isNotEmpty) {
-        final query = _searchQuery.toLowerCase();
-        final nameMatch = charger.name.toLowerCase().contains(query);
-        final addressMatch = charger.address.toLowerCase().contains(query);
-        if (!nameMatch && !addressMatch) return false;
+        final q = _searchQuery.toLowerCase();
+        final matchName = charger.name.toLowerCase().contains(q);
+        final matchAddress = charger.address.toLowerCase().contains(q);
+        if (!matchName && !matchAddress) return false;
       }
 
       return true;
     }).toList();
   }
 
-  // ── Markers ───────────────────────────────────────────────────────────────
+  // ── Map Markers ───────────────────────────────────────────────────────────
   Set<Marker> _buildMarkers() {
     return _filteredChargers.map((charger) {
       return Marker(
         markerId: MarkerId(charger.id),
         position: LatLng(charger.latitude, charger.longitude),
         icon: _customMarker ??
-            BitmapDescriptor.defaultMarkerWithHue(
-              charger.isAvailable
-                  ? BitmapDescriptor.hueGreen
-                  : BitmapDescriptor.hueRed,
-            ),
+            (charger.isAvailable
+                ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
+                : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)),
         infoWindow: InfoWindow(
           title: charger.name,
-          snippet: '${charger.powerLabel} • ₹${charger.pricePerKwh.toStringAsFixed(0)}/kWh',
+          snippet:
+              '${charger.powerLabel} • ₹${charger.pricePerKwh.toStringAsFixed(0)}/kWh',
           onTap: () => _showDetail(charger),
         ),
         onTap: () => _showDetail(charger),
@@ -162,7 +161,7 @@ class _CustomerHomeState extends State<CustomerHome> {
     }).toSet();
   }
 
-  // ── Bottom sheet: Charger Detail ──────────────────────────────────────────
+  // ── Detail Sheet ──────────────────────────────────────────────────────────
   void _showDetail(ChargerModel charger) {
     showModalBottomSheet(
       context: context,
@@ -172,7 +171,7 @@ class _CustomerHomeState extends State<CustomerHome> {
     );
   }
 
-  // ── Bottom sheet: Filter ──────────────────────────────────────────────────
+  // ── Filter Sheet ──────────────────────────────────────────────────────────
   void _openFilterSheet() {
     showModalBottomSheet(
       context: context,
@@ -190,21 +189,9 @@ class _CustomerHomeState extends State<CustomerHome> {
     );
   }
 
-  // ── Go to user location ───────────────────────────────────────────────────
+  // ── Geolocation (Find My Location) ────────────────────────────────────────
   Future<void> _goToMyLocation() async {
     try {
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Location services are disabled on your device."),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        return;
-      }
-
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -212,9 +199,11 @@ class _CustomerHomeState extends State<CustomerHome> {
       if (permission == LocationPermission.deniedForever) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Location permission is permanently denied in settings."),
-            behavior: SnackBarBehavior.floating,
+          SnackBar(
+            content: const Text(
+              'Location permission permanently denied. Enable it in app settings.',
+            ),
+            backgroundColor: AppColors.error,
           ),
         );
         return;
@@ -223,22 +212,23 @@ class _CustomerHomeState extends State<CustomerHome> {
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 10),
         ),
       );
 
+      final latLng = LatLng(position.latitude, position.longitude);
+
       _mapController?.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
-            zoom: 15,
-          ),
+          CameraPosition(target: latLng, zoom: 15.5),
         ),
       );
     } catch (_) {
-      // Fallback
-      _mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(_initialPosition),
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Could not obtain current location'),
+          backgroundColor: AppColors.error,
+        ),
       );
     }
   }
@@ -258,14 +248,13 @@ class _CustomerHomeState extends State<CustomerHome> {
     return Scaffold(
       body: Stack(
         children: [
-          // ── Google Map ──────────────────────────────────────────────────
+          // ── Google Map with dynamic dark Midnight style ──────────────────
           GoogleMap(
             initialCameraPosition: _initialPosition,
             markers: _buildMarkers(),
             style: isDark ? MapStyles.darkMapStyle : null,
             onMapCreated: (controller) {
               _mapController = controller;
-              _goToMyLocation();
             },
             zoomControlsEnabled: false,
             myLocationButtonEnabled: false,
@@ -281,11 +270,10 @@ class _CustomerHomeState extends State<CustomerHome> {
                   // Glass Search Bar
                   Expanded(
                     child: GlassContainer(
+                      tier: GlassTier.secondary,
                       height: 52,
                       borderRadius: BorderRadius.circular(18),
-                      blur: 16,
-                      opacity: isDark ? 0.35 : 0.85,
-                      color: isDark ? const Color(0xFF0B132B) : Colors.white,
+                      borderColor: AppColors.deepTeal.withValues(alpha: isDark ? 0.35 : 0.20),
                       child: TextField(
                         onChanged: (value) {
                           setState(() {
@@ -294,22 +282,22 @@ class _CustomerHomeState extends State<CustomerHome> {
                           });
                         },
                         style: TextStyle(
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
-                        cursorColor: const Color(0xFF00E676),
+                        cursorColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
                         decoration: InputDecoration(
                           hintText: 'Search EV charging stations...',
                           hintStyle: TextStyle(
                             color: isDark
-                                ? Colors.white.withValues(alpha: 0.5)
-                                : const Color(0xFF94A3B8),
+                                ? AppColors.neutral
+                                : AppColors.neutral.withValues(alpha: 0.7),
                             fontSize: 13,
                           ),
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.search_rounded,
-                            color: Color(0xFF00E676),
+                            color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                             size: 20,
                           ),
                           border: InputBorder.none,
@@ -326,26 +314,21 @@ class _CustomerHomeState extends State<CustomerHome> {
 
                   // Glass Filter button
                   GlassContainer(
+                    tier: GlassTier.secondary,
                     width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 16,
-                    opacity: _filter.isActive ? 0.9 : (isDark ? 0.35 : 0.85),
-                    color: _filter.isActive
-                        ? const Color(0xFF00E676)
-                        : (isDark ? const Color(0xFF0B132B) : Colors.white),
+                    color: _filter.isActive ? AppColors.deepTeal : null,
                     borderColor: _filter.isActive
-                        ? const Color(0xFF00E676)
-                        : (isDark
-                            ? Colors.white.withValues(alpha: 0.25)
-                            : Colors.black.withValues(alpha: 0.08)),
-                    glowColor: _filter.isActive ? const Color(0xFF00E676) : null,
+                        ? AppColors.deepTeal
+                        : (isDark ? AppColors.deepTeal.withValues(alpha: 0.35) : AppColors.neutral.withValues(alpha: 0.15)),
+                    glowColor: _filter.isActive ? AppColors.accentLime : null,
                     onTap: _openFilterSheet,
                     child: Icon(
                       Icons.tune_rounded,
                       color: _filter.isActive
-                          ? const Color(0xFF0B132B)
-                          : (isDark ? Colors.white : const Color(0xFF0F172A)),
+                          ? AppColors.accentLime
+                          : (isDark ? AppColors.darkText : AppColors.neutralDark),
                       size: 20,
                     ),
                   ),
@@ -354,16 +337,15 @@ class _CustomerHomeState extends State<CustomerHome> {
 
                   // Glass My Bookings button
                   GlassContainer(
+                    tier: GlassTier.secondary,
                     width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 16,
-                    opacity: isDark ? 0.35 : 0.85,
-                    color: isDark ? const Color(0xFF0B132B) : Colors.white,
+                    borderColor: isDark ? AppColors.deepTeal.withValues(alpha: 0.35) : AppColors.neutral.withValues(alpha: 0.15),
                     onTap: () => Navigator.pushNamed(context, '/my-bookings'),
-                    child: const Icon(
+                    child: Icon(
                       Icons.calendar_month_rounded,
-                      color: Color(0xFF00E676),
+                      color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                       size: 20,
                     ),
                   ),
@@ -372,20 +354,19 @@ class _CustomerHomeState extends State<CustomerHome> {
 
                   // Glass Theme Toggle button
                   GlassContainer(
+                    tier: GlassTier.secondary,
                     width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 16,
-                    opacity: isDark ? 0.35 : 0.85,
-                    color: isDark ? const Color(0xFF0B132B) : Colors.white,
+                    borderColor: isDark ? AppColors.deepTeal.withValues(alpha: 0.35) : AppColors.neutral.withValues(alpha: 0.15),
                     onTap: () => ThemeService.toggleTheme(),
                     child: Icon(
                       isDark
                           ? Icons.wb_sunny_rounded
                           : Icons.nightlight_round,
                       color: isDark
-                          ? const Color(0xFFFFB300)
-                          : const Color(0xFF3395FF),
+                          ? const Color(0xFFF59E0B)
+                          : AppColors.deepTeal,
                       size: 20,
                     ),
                   ),
@@ -394,16 +375,15 @@ class _CustomerHomeState extends State<CustomerHome> {
 
                   // Glass Logout button
                   GlassContainer(
+                    tier: GlassTier.secondary,
                     width: 48,
                     height: 52,
                     borderRadius: BorderRadius.circular(18),
-                    blur: 16,
-                    opacity: isDark ? 0.35 : 0.85,
-                    color: isDark ? const Color(0xFF0B132B) : Colors.white,
+                    borderColor: isDark ? AppColors.deepTeal.withValues(alpha: 0.35) : AppColors.neutral.withValues(alpha: 0.15),
                     onTap: _logout,
                     child: Icon(
                       Icons.logout_rounded,
-                      color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                       size: 20,
                     ),
                   ),
@@ -417,7 +397,7 @@ class _CustomerHomeState extends State<CustomerHome> {
             Container(
               color: Colors.black.withValues(alpha: 0.4),
               child: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF00E676)),
+                child: CircularProgressIndicator(color: AppColors.deepTeal),
               ),
             ),
 
@@ -436,16 +416,19 @@ class _CustomerHomeState extends State<CustomerHome> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 230),
         child: GlassContainer(
+          tier: GlassTier.secondary,
           width: 48,
           height: 48,
           borderRadius: BorderRadius.circular(16),
-          blur: 16,
-          opacity: isDark ? 0.4 : 0.9,
-          color: isDark ? const Color(0xFF0B132B) : Colors.white,
-          glowColor: const Color(0xFF00E676),
+          glowColor: AppColors.accentLime,
+          borderColor: isDark ? AppColors.deepTeal.withValues(alpha: 0.4) : AppColors.deepTeal.withValues(alpha: 0.25),
           onTap: _goToMyLocation,
-          child: const Center(
-            child: Icon(Icons.my_location_rounded, color: Color(0xFF00E676), size: 22),
+          child: Center(
+            child: Icon(
+              Icons.my_location_rounded,
+              color: isDark ? AppColors.accentLime : AppColors.deepTeal,
+              size: 22,
+            ),
           ),
         ),
       ),
@@ -458,22 +441,20 @@ class _CustomerHomeState extends State<CustomerHome> {
 
     if (_filteredChargers.isEmpty) {
       return GlassContainer(
+        tier: GlassTier.secondary,
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(18),
         borderRadius: BorderRadius.circular(20),
-        blur: 16,
-        opacity: isDark ? 0.35 : 0.9,
-        color: isDark ? const Color(0xFF0B132B) : Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.search_off_rounded,
-                color: isDark ? Colors.white54 : Colors.black45),
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral),
             const SizedBox(width: 10),
             Text(
               'No chargers match your filters',
               style: TextStyle(
-                color: isDark ? Colors.white70 : const Color(0xFF475569),
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -498,7 +479,7 @@ class _CustomerHomeState extends State<CustomerHome> {
                 _buildSmartPill(
                   icon: Icons.auto_awesome_rounded,
                   label: "AI Smart Match",
-                  color: const Color(0xFF00E676),
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                   onTap: () {
                     showModalBottomSheet(
                       context: context,
@@ -516,7 +497,7 @@ class _CustomerHomeState extends State<CustomerHome> {
                 _buildSmartPill(
                   icon: Icons.alt_route_rounded,
                   label: "Trip Planner",
-                  color: const Color(0xFF00E5FF),
+                  color: isDark ? AppColors.accentLime : AppColors.primaryLight,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -528,7 +509,7 @@ class _CustomerHomeState extends State<CustomerHome> {
                 _buildSmartPill(
                   icon: Icons.bolt_rounded,
                   label: "Live Session",
-                  color: const Color(0xFFFFB300),
+                  color: const Color(0xFFF59E0B),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -545,17 +526,15 @@ class _CustomerHomeState extends State<CustomerHome> {
           Padding(
             padding: const EdgeInsets.only(left: 18, bottom: 8),
             child: GlassContainer(
+              tier: GlassTier.tertiary,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               borderRadius: BorderRadius.circular(14),
-              blur: 16,
-              opacity: isDark ? 0.35 : 0.9,
-              color: isDark ? const Color(0xFF0B132B) : Colors.white,
               child: Text(
                 '${_filteredChargers.length} station${_filteredChargers.length == 1 ? '' : 's'} nearby',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
             ),
@@ -601,12 +580,10 @@ class _CustomerHomeState extends State<CustomerHome> {
     final isDark = ThemeService.isDark(context);
 
     return GlassContainer(
+      tier: GlassTier.tertiary,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       borderRadius: BorderRadius.circular(20),
-      blur: 16,
-      opacity: isDark ? 0.35 : 0.9,
-      color: isDark ? const Color(0xFF0B132B) : Colors.white,
-      borderColor: color.withValues(alpha: isDark ? 0.4 : 0.6),
+      borderColor: color.withValues(alpha: isDark ? 0.40 : 0.30),
       onTap: onTap,
       child: Row(
         mainAxisSize: MainAxisSize.min,

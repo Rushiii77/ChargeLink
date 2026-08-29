@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_button.dart';
@@ -28,7 +29,7 @@ class ChargerDetailSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.15),
+                color: isDark ? Colors.white.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -45,7 +46,7 @@ class ChargerDetailSheet extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
               ),
@@ -54,13 +55,13 @@ class ChargerDetailSheet extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: charger.isAvailable
-                      ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15)
-                      : Colors.redAccent.withValues(alpha: isDark ? 0.2 : 0.15),
+                      ? AppColors.accentLime.withValues(alpha: isDark ? 0.25 : 0.35)
+                      : AppColors.error.withValues(alpha: isDark ? 0.20 : 0.12),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: charger.isAvailable
-                        ? const Color(0xFF00E676).withValues(alpha: 0.5)
-                        : Colors.redAccent.withValues(alpha: 0.5),
+                        ? AppColors.accentLime.withValues(alpha: 0.6)
+                        : AppColors.error.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Text(
@@ -69,8 +70,8 @@ class ChargerDetailSheet extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                     color: charger.isAvailable
-                        ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                        : Colors.redAccent.shade100,
+                        ? (isDark ? AppColors.accentLime : AppColors.primaryDark)
+                        : AppColors.error,
                   ),
                 ),
               ),
@@ -85,14 +86,14 @@ class ChargerDetailSheet extends StatelessWidget {
               Icon(
                 Icons.location_on_rounded,
                 size: 16,
-                color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
               ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   charger.address,
                   style: TextStyle(
-                    color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                     fontSize: 13,
                   ),
                 ),
@@ -102,7 +103,7 @@ class ChargerDetailSheet extends StatelessWidget {
 
           const SizedBox(height: 18),
           Divider(
-            color: isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.08),
+            color: isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12),
           ),
           const SizedBox(height: 16),
 
@@ -111,7 +112,7 @@ class ChargerDetailSheet extends StatelessWidget {
             children: [
               _glassSpecTile(
                 icon: Icons.bolt_rounded,
-                iconColor: const Color(0xFFFFB300),
+                iconColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 label: 'Charging Speed',
                 value: charger.powerLabel,
                 isDark: isDark,
@@ -119,7 +120,7 @@ class ChargerDetailSheet extends StatelessWidget {
               const SizedBox(width: 12),
               _glassSpecTile(
                 icon: Icons.electrical_services_rounded,
-                iconColor: const Color(0xFF00E5FF),
+                iconColor: AppColors.primaryLight,
                 label: 'Connector Standard',
                 value: charger.connectorType,
                 isDark: isDark,
@@ -133,7 +134,7 @@ class ChargerDetailSheet extends StatelessWidget {
             children: [
               _glassSpecTile(
                 icon: Icons.currency_rupee_rounded,
-                iconColor: const Color(0xFF00E676),
+                iconColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 label: 'Energy Rate',
                 value: '₹${charger.pricePerKwh.toStringAsFixed(0)} / kWh',
                 isDark: isDark,
@@ -141,7 +142,7 @@ class ChargerDetailSheet extends StatelessWidget {
               const SizedBox(width: 12),
               _glassSpecTile(
                 icon: Icons.star_rounded,
-                iconColor: const Color(0xFFFFB300),
+                iconColor: const Color(0xFFF59E0B),
                 label: 'User Rating',
                 value: charger.ratingLabel,
                 isDark: isDark,
@@ -151,11 +152,11 @@ class ChargerDetailSheet extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Book Now Glass Button
+          // Book Now Button
           GlassButton(
             text: charger.isAvailable ? 'RESERVE CHARGING SLOT' : 'CURRENTLY OCCUPIED',
             icon: Icons.flash_on_rounded,
-            color: charger.isAvailable ? const Color(0xFF00E676) : null,
+            variant: charger.isAvailable ? GlassButtonVariant.primary : GlassButtonVariant.secondary,
             onPressed: charger.isAvailable
                 ? () {
                     Navigator.pop(context);
@@ -192,7 +193,7 @@ class ChargerDetailSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: isDark ? 0.18 : 0.12),
+                color: iconColor.withValues(alpha: isDark ? 0.20 : 0.10),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, size: 20, color: iconColor),
@@ -206,7 +207,7 @@ class ChargerDetailSheet extends StatelessWidget {
                     label,
                     style: TextStyle(
                       fontSize: 11,
-                      color: isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B),
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                     ),
                   ),
                   Text(
@@ -214,7 +215,7 @@ class ChargerDetailSheet extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: isDark ? AppColors.darkText : AppColors.neutralDark,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

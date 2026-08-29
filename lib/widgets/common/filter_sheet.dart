@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import '../../services/theme_service.dart';
 import '../glass/glass_button.dart';
 import '../glass/glass_container.dart';
@@ -83,7 +84,7 @@ class _FilterSheetState extends State<FilterSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.15),
+                color: isDark ? Colors.white.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -97,7 +98,7 @@ class _FilterSheetState extends State<FilterSheet> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
               const Spacer(),
@@ -110,7 +111,7 @@ class _FilterSheetState extends State<FilterSheet> {
                 child: const Text(
                   'Reset',
                   style: TextStyle(
-                    color: Color(0xFFF43F5E),
+                    color: AppColors.error,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -167,13 +168,13 @@ class _FilterSheetState extends State<FilterSheet> {
               'Show available stations only',
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 fontWeight: FontWeight.w500,
               ),
             ),
             value: _filter.availableOnly,
-            activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.5),
-            activeThumbColor: const Color(0xFF00E676),
+            activeTrackColor: AppColors.deepTeal.withValues(alpha: 0.5),
+            activeThumbColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
             onChanged: (v) =>
                 setState(() => _filter = _filter.copyWith(availableOnly: v)),
           ),
@@ -200,7 +201,7 @@ class _FilterSheetState extends State<FilterSheet> {
       style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: isDark ? Colors.white.withValues(alpha: 0.8) : const Color(0xFF475569),
+        color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
       ),
     );
   }
@@ -219,12 +220,14 @@ class _FilterSheetState extends State<FilterSheet> {
           label: Text(opt),
           selected: isSelected,
           onSelected: (_) => onSelected(opt),
-          selectedColor: const Color(0xFF00E676).withValues(alpha: isDark ? 0.25 : 0.2),
-          backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+          selectedColor: isDark
+              ? AppColors.deepTeal.withValues(alpha: 0.40)
+              : AppColors.accentLime.withValues(alpha: 0.35),
+          backgroundColor: isDark ? AppColors.darkCard : AppColors.white.withValues(alpha: 0.7),
           labelStyle: TextStyle(
             color: isSelected
-                ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 12,
           ),
@@ -232,8 +235,8 @@ class _FilterSheetState extends State<FilterSheet> {
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(
               color: isSelected
-                  ? const Color(0xFF00E676)
-                  : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                  ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                  : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.15)),
             ),
           ),
         );
@@ -256,12 +259,14 @@ class _FilterSheetState extends State<FilterSheet> {
           label: Text(labels[i]),
           selected: isSelected,
           onSelected: (_) => onSelected(options[i]),
-          selectedColor: const Color(0xFF00E676).withValues(alpha: isDark ? 0.25 : 0.2),
-          backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+          selectedColor: isDark
+              ? AppColors.deepTeal.withValues(alpha: 0.40)
+              : AppColors.accentLime.withValues(alpha: 0.35),
+          backgroundColor: isDark ? AppColors.darkCard : AppColors.white.withValues(alpha: 0.7),
           labelStyle: TextStyle(
             color: isSelected
-                ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 12,
           ),
@@ -269,8 +274,8 @@ class _FilterSheetState extends State<FilterSheet> {
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(
               color: isSelected
-                  ? const Color(0xFF00E676)
-                  : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                  ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                  : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.15)),
             ),
           ),
         );

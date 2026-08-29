@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
 import '../../../services/theme_service.dart';
@@ -106,7 +107,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("⚡ Charger published to the live network!"),
-          backgroundColor: const Color(0xFF00E676),
+          backgroundColor: AppColors.deepTeal,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -125,7 +126,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: isError ? Colors.redAccent.shade700 : const Color(0xFF00E676),
+        backgroundColor: isError ? AppColors.error : AppColors.deepTeal,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
@@ -159,7 +160,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                           padding: EdgeInsets.zero,
                           icon: Icon(
                             Icons.arrow_back_ios_new_rounded,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            color: isDark ? AppColors.darkText : AppColors.neutralDark,
                             size: 18,
                           ),
                           onPressed: () => Navigator.pop(context),
@@ -171,7 +172,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
                         ),
                       ),
                     ],
@@ -227,7 +228,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                           "Current Standard",
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -241,18 +242,22 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                                 label: Text(type == 'DC' ? 'DC Fast Charging' : 'AC Standard'),
                                 selected: isSelected,
                                 onSelected: (_) => setState(() => _selectedChargerType = type),
-                                selectedColor: const Color(0xFF00E676).withValues(alpha: isDark ? 0.25 : 0.2),
-                                backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                selectedColor: isDark
+                                    ? AppColors.deepTeal.withValues(alpha: 0.40)
+                                    : AppColors.accentLime.withValues(alpha: 0.35),
+                                backgroundColor: isDark ? AppColors.darkCard : AppColors.white.withValues(alpha: 0.7),
                                 labelStyle: TextStyle(
                                   color: isSelected
-                                      ? (isDark ? const Color(0xFF00E676) : const Color(0xFF00A040))
-                                      : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                                      ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                                      : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                   side: BorderSide(
-                                    color: isSelected ? const Color(0xFF00E676) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                                    color: isSelected
+                                        ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                                        : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
                                   ),
                                 ),
                               ),
@@ -266,7 +271,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                           "Power Output Rating (kW)",
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -283,18 +288,22 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                                   label: Text("${kw.toInt()} kW"),
                                   selected: isSelected,
                                   onSelected: (_) => setState(() => _selectedPowerKw = kw),
-                                  selectedColor: const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.25 : 0.2),
-                                  backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                  selectedColor: isDark
+                                      ? AppColors.deepTeal.withValues(alpha: 0.40)
+                                      : AppColors.accentLime.withValues(alpha: 0.35),
+                                  backgroundColor: isDark ? AppColors.darkCard : AppColors.white.withValues(alpha: 0.7),
                                   labelStyle: TextStyle(
                                     color: isSelected
-                                        ? const Color(0xFF00B4D8)
-                                        : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                                        ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                                        : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                     side: BorderSide(
-                                      color: isSelected ? const Color(0xFF00E5FF) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                                      color: isSelected
+                                          ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                                          : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
                                     ),
                                   ),
                                 ),
@@ -309,7 +318,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                           "Connector Port Type",
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -323,18 +332,22 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                                 label: Text(conn),
                                 selected: isSelected,
                                 onSelected: (_) => setState(() => _selectedConnector = conn),
-                                selectedColor: const Color(0xFF8B5CF6).withValues(alpha: isDark ? 0.25 : 0.2),
-                                backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                selectedColor: isDark
+                                    ? AppColors.deepTeal.withValues(alpha: 0.40)
+                                    : AppColors.accentLime.withValues(alpha: 0.35),
+                                backgroundColor: isDark ? AppColors.darkCard : AppColors.white.withValues(alpha: 0.7),
                                 labelStyle: TextStyle(
                                   color: isSelected
-                                      ? const Color(0xFF8B5CF6)
-                                      : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                                      ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                                      : (isDark ? AppColors.darkTextSecondary : AppColors.neutral),
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                   side: BorderSide(
-                                    color: isSelected ? const Color(0xFF8B5CF6) : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+                                    color: isSelected
+                                        ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                                        : (isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
                                   ),
                                 ),
                               ),
@@ -390,13 +403,13 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
                         const SizedBox(height: 12),
                         TextButton.icon(
                           onPressed: _fetchCurrentLocation,
-                          icon: const Icon(Icons.gps_fixed_rounded, size: 16, color: Color(0xFF00E676)),
+                          icon: Icon(Icons.gps_fixed_rounded, size: 16, color: isDark ? AppColors.accentLime : AppColors.deepTeal),
                           label: Text(
                             "Auto-detect GPS coordinates",
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                              color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                             ),
                           ),
                         ),
@@ -430,7 +443,7 @@ class _AddChargerScreenState extends State<AddChargerScreen> {
       style: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.bold,
-        color: isDark ? Colors.white : const Color(0xFF0F172A),
+        color: isDark ? AppColors.darkText : AppColors.neutralDark,
         letterSpacing: 0.5,
       ),
     );

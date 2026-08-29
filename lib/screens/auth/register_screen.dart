@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../core/theme/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../../services/theme_service.dart';
 import '../../widgets/glass/glass_background.dart';
@@ -101,7 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: isError ? Colors.redAccent.shade700 : const Color(0xFF00E676),
+        backgroundColor: isError ? AppColors.error : AppColors.deepTeal,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
@@ -124,19 +125,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Floating Crystal Logo Icon
+                    // Floating Logo Icon
                     GlassContainer(
                       tier: GlassTier.secondary,
                       width: 72,
                       height: 72,
                       borderRadius: BorderRadius.circular(22),
-                      glowColor: const Color(0xFF00E676),
-                      glowSpread: 2,
-                      child: const Center(
+                      glowColor: AppColors.accentLime,
+                      glowSpread: 1,
+                      child: Center(
                         child: Icon(
                           Icons.person_add_alt_1_rounded,
                           size: 36,
-                          color: Color(0xFF00E676),
+                          color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                         ),
                       ),
                     ),
@@ -148,7 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -156,10 +157,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 6),
 
                     Text(
-                      "Join the ChargeLink EV charging ecosystem",
+                      "Join the ChargeLink EV charging network",
                       style: TextStyle(
                         fontSize: 13,
-                        color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                       ),
                     ),
 
@@ -217,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _hidePassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
-                                color: isDark ? Colors.white60 : const Color(0xFF94A3B8),
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                                 size: 20,
                               ),
                               onPressed: () =>
@@ -240,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _hideConfirmPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
-                                color: isDark ? Colors.white60 : const Color(0xFF94A3B8),
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                                 size: 20,
                               ),
                               onPressed: () => setState(
@@ -273,14 +274,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Text(
                             "Already have an account?",
                             style: TextStyle(
-                              color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF64748B),
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                               fontSize: 13,
                             ),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context),
                             style: TextButton.styleFrom(
-                              foregroundColor: const Color(0xFF00E676),
+                              foregroundColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
                               padding: const EdgeInsets.only(left: 8),
                             ),
                             child: const Text(

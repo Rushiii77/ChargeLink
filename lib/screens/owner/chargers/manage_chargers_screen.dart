@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/charger_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/charger_service.dart';
@@ -28,7 +29,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
           content: Text(
             "${charger.name} is now ${newValue ? 'Online & Available' : 'Offline / Maintenance'}",
           ),
-          backgroundColor: newValue ? const Color(0xFF00E676) : const Color(0xFF0B132B),
+          backgroundColor: newValue ? AppColors.deepTeal : AppColors.neutralDark,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -38,7 +39,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Failed to update status: $e"),
-          backgroundColor: Colors.redAccent.shade700,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -51,32 +52,32 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF0B132B) : Colors.white,
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+          side: BorderSide(color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.15)),
         ),
         title: Text(
           "Delete Station",
           style: TextStyle(
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            color: isDark ? AppColors.darkText : AppColors.neutralDark,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           "Are you sure you want to remove '${charger.name}' from the charging network?",
           style: TextStyle(
-            color: isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF475569),
+            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text("Cancel", style: TextStyle(color: isDark ? Colors.white60 : const Color(0xFF64748B))),
+            child: Text("Cancel", style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent.shade400,
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -93,7 +94,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Charging station removed"),
-          backgroundColor: Colors.redAccent.shade700,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -111,7 +112,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
         body: Center(
           child: Text(
             "Please login to manage chargers",
-            style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A)),
+            style: TextStyle(color: isDark ? AppColors.darkText : AppColors.neutralDark),
           ),
         ),
       );
@@ -136,7 +137,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                         padding: EdgeInsets.zero,
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
                           size: 18,
                         ),
                         onPressed: () => Navigator.pop(context),
@@ -148,7 +149,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                   ],
@@ -162,7 +163,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
-                        child: CircularProgressIndicator(color: Color(0xFF00E676)),
+                        child: CircularProgressIndicator(color: AppColors.deepTeal),
                       );
                     }
 
@@ -178,13 +179,13 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                               Container(
                                 padding: const EdgeInsets.all(22),
                                 decoration: BoxDecoration(
-                                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04),
+                                  color: isDark ? AppColors.darkCard : AppColors.white,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.ev_station_rounded,
                                   size: 48,
-                                  color: Color(0xFF00E676),
+                                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -193,7 +194,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -202,7 +203,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                                 ),
                               ),
                               const SizedBox(height: 24),
@@ -239,8 +240,8 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFF00E676),
-        foregroundColor: const Color(0xFF0B132B),
+        backgroundColor: AppColors.deepTeal,
+        foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: const Text("ADD CHARGER", style: TextStyle(fontWeight: FontWeight.bold)),
         onPressed: () {
@@ -258,10 +259,10 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
       tier: GlassTier.secondary,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(20),
       borderColor: charger.isAvailable
-          ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.4 : 0.6)
-          : (isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.08)),
+          ? AppColors.deepTeal.withValues(alpha: isDark ? 0.40 : 0.30)
+          : (isDark ? AppColors.neutral.withValues(alpha: 0.15) : AppColors.neutral.withValues(alpha: 0.10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -271,15 +272,15 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: charger.isAvailable
-                      ? const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15)
-                      : Colors.redAccent.withValues(alpha: isDark ? 0.2 : 0.15),
+                      ? AppColors.deepTeal.withValues(alpha: isDark ? 0.35 : 0.12)
+                      : AppColors.error.withValues(alpha: isDark ? 0.20 : 0.10),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   Icons.ev_station_rounded,
                   color: charger.isAvailable
-                      ? const Color(0xFF00E676)
-                      : Colors.redAccent.shade100,
+                      ? (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                      : AppColors.error,
                   size: 24,
                 ),
               ),
@@ -293,7 +294,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -301,7 +302,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                       charger.address,
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -310,7 +311,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.delete_outline_rounded, color: Colors.redAccent.shade200, size: 20),
+                icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
                 onPressed: () => _deleteCharger(charger),
               ),
             ],
@@ -319,7 +320,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
           const SizedBox(height: 14),
           Divider(
             height: 1,
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
+            color: isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12),
           ),
           const SizedBox(height: 12),
 
@@ -331,22 +332,23 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? AppColors.darkText : AppColors.neutralDark,
                 ),
               ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E5FF).withValues(alpha: isDark ? 0.15 : 0.1),
+                  color: AppColors.deepTeal.withValues(alpha: isDark ? 0.25 : 0.10),
                   borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.deepTeal.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   charger.connectorType,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF00B4D8),
+                    color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                   ),
                 ),
               ),
@@ -356,7 +358,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                  color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                 ),
               ),
             ],
@@ -368,7 +370,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.03),
+              color: isDark ? AppColors.darkCard.withValues(alpha: 0.6) : AppColors.lightBg,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -381,7 +383,7 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                       height: 10,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: charger.isAvailable ? const Color(0xFF00E676) : Colors.redAccent,
+                        color: charger.isAvailable ? AppColors.accentLime : AppColors.error,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -390,15 +392,15 @@ class _ManageChargersScreenState extends State<ManageChargersScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white70 : const Color(0xFF475569),
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                       ),
                     ),
                   ],
                 ),
                 Switch.adaptive(
                   value: charger.isAvailable,
-                  activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.5),
-                  activeThumbColor: const Color(0xFF00E676),
+                  activeTrackColor: AppColors.deepTeal.withValues(alpha: 0.5),
+                  activeThumbColor: isDark ? AppColors.accentLime : AppColors.deepTeal,
                   onChanged: (val) => _toggleAvailability(charger, val),
                 ),
               ],

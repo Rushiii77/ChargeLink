@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
@@ -36,10 +37,11 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
     if (!mounted) return;
     setState(() => _isSaving = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Host profile and payout settings updated!"),
-        backgroundColor: Color(0xFF00E676),
+      SnackBar(
+        content: const Text("Host profile and payout settings updated!"),
+        backgroundColor: AppColors.deepTeal,
         behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
@@ -70,7 +72,7 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                         padding: EdgeInsets.zero,
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
                           size: 18,
                         ),
                         onPressed: () => Navigator.pop(context),
@@ -82,7 +84,7 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                   ],
@@ -100,16 +102,16 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                       Container(
                         width: 64,
                         height: 64,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF00E676), Color(0xFF00E5FF)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          color: isDark ? AppColors.deepTeal : AppColors.accentLime,
                         ),
-                        child: const Center(
-                          child: Icon(Icons.storefront_rounded, color: Color(0xFF0B132B), size: 34),
+                        child: Center(
+                          child: Icon(
+                            Icons.storefront_rounded,
+                            color: isDark ? AppColors.accentLime : AppColors.deepTeal,
+                            size: 34,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -122,7 +124,7 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                color: isDark ? AppColors.darkText : AppColors.neutralDark,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -130,14 +132,16 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                               user?.email ?? "host@chargelink.com",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isDark ? Colors.white.withValues(alpha: 0.65) : const Color(0xFF64748B),
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00E676).withValues(alpha: isDark ? 0.2 : 0.15),
+                                color: isDark
+                                    ? AppColors.deepTeal.withValues(alpha: 0.35)
+                                    : AppColors.accentLime.withValues(alpha: 0.35),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -145,7 +149,7 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? const Color(0xFF00E676) : const Color(0xFF00A040),
+                                  color: isDark ? AppColors.accentLime : AppColors.primaryDark,
                                 ),
                               ),
                             ),
@@ -164,7 +168,7 @@ class _HostProfileScreenState extends State<HostProfileScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? AppColors.darkText : AppColors.neutralDark,
                   ),
                 ),
                 const SizedBox(height: 12),

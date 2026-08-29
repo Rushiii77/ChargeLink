@@ -1,18 +1,22 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import '../../services/theme_service.dart';
 
 enum GlassButtonVariant {
-  /// Luminous primary action with glowing emerald gradient
+  /// Deep Teal (#05624D) background with white text (Primary brand anchor)
   primary,
 
-  /// Frosted crystal secondary surface with crisp translucent border
+  /// Accent Lime (#DDF28A) background with Dark Neutral (#17201E) text (Primary CTA highlight)
+  accent,
+
+  /// Clean light surface with Deep Teal border and text (Secondary action)
   secondary,
 
-  /// Minimal transparent touch target with soft hover/press tint
+  /// Minimal transparent touch target with Deep Teal text
   ghost,
 
-  /// Luminous rose crimson for dangerous or cancellation actions
+  /// Luminous crimson red for dangerous or cancellation actions
   destructive,
 }
 
@@ -37,9 +41,9 @@ class GlassButton extends StatefulWidget {
     this.icon,
     this.color,
     this.textColor,
-    this.height = 54,
+    this.height = 52,
     this.width,
-    this.borderRadius = 28,
+    this.borderRadius = 26,
   });
 
   @override
@@ -62,49 +66,60 @@ class _GlassButtonState extends State<GlassButton> {
 
     switch (widget.variant) {
       case GlassButtonVariant.primary:
-        baseColor = widget.color ?? const Color(0xFF00E676);
+        baseColor = widget.color ?? AppColors.deepTeal;
         contentColor = widget.textColor ?? Colors.white;
         gradientColors = [
-          baseColor.withValues(alpha: 0.95),
-          baseColor.withValues(alpha: 0.75),
+          _isPressed ? AppColors.primaryDark : AppColors.deepTeal,
+          _isPressed ? AppColors.primaryDark : AppColors.primaryLight,
         ];
-        borderColor = Colors.white.withValues(alpha: 0.4);
-        glowColor = baseColor;
+        borderColor = AppColors.primaryLight.withValues(alpha: 0.6);
+        glowColor = AppColors.deepTeal;
+        break;
+
+      case GlassButtonVariant.accent:
+        baseColor = widget.color ?? AppColors.accentLime;
+        contentColor = widget.textColor ?? AppColors.neutralDark;
+        gradientColors = [
+          _isPressed ? AppColors.accentLight : AppColors.accentLime,
+          _isPressed ? AppColors.accentLime : const Color(0xFFD4EB78),
+        ];
+        borderColor = AppColors.accentLight;
+        glowColor = AppColors.accentLime;
         break;
 
       case GlassButtonVariant.secondary:
-        baseColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-        contentColor = widget.textColor ?? (isDark ? Colors.white : const Color(0xFF0F172A));
+        baseColor = isDark ? AppColors.darkCard : AppColors.white;
+        contentColor = widget.textColor ?? (isDark ? AppColors.accentLime : AppColors.deepTeal);
         gradientColors = [
-          baseColor.withValues(alpha: isDark ? 0.35 : 0.9),
-          baseColor.withValues(alpha: isDark ? 0.20 : 0.7),
+          baseColor.withValues(alpha: isDark ? 0.60 : 0.95),
+          baseColor.withValues(alpha: isDark ? 0.40 : 0.85),
         ];
-        borderColor = isDark ? Colors.white.withValues(alpha: 0.22) : Colors.black.withValues(alpha: 0.12);
+        borderColor = isDark ? AppColors.deepTeal.withValues(alpha: 0.5) : AppColors.deepTeal.withValues(alpha: 0.35);
         glowColor = Colors.transparent;
         break;
 
       case GlassButtonVariant.ghost:
         baseColor = Colors.transparent;
-        contentColor = widget.textColor ?? (isDark ? Colors.white70 : const Color(0xFF475569));
+        contentColor = widget.textColor ?? (isDark ? AppColors.accentLime : AppColors.deepTeal);
         gradientColors = [Colors.transparent, Colors.transparent];
         borderColor = Colors.transparent;
         glowColor = Colors.transparent;
         break;
 
       case GlassButtonVariant.destructive:
-        baseColor = widget.color ?? const Color(0xFFF43F5E);
+        baseColor = widget.color ?? AppColors.error;
         contentColor = widget.textColor ?? Colors.white;
         gradientColors = [
           baseColor.withValues(alpha: 0.95),
           baseColor.withValues(alpha: 0.80),
         ];
-        borderColor = Colors.white.withValues(alpha: 0.35);
-        glowColor = baseColor;
+        borderColor = AppColors.error.withValues(alpha: 0.5);
+        glowColor = AppColors.error;
         break;
     }
 
     return AnimatedScale(
-      scale: _isPressed && isEnabled ? 0.97 : 1.0,
+      scale: _isPressed && isEnabled ? 0.98 : 1.0,
       duration: const Duration(milliseconds: 120),
       curve: Curves.easeInOut,
       child: Container(
@@ -115,9 +130,9 @@ class _GlassButtonState extends State<GlassButton> {
           boxShadow: isEnabled && glowColor != Colors.transparent
               ? [
                   BoxShadow(
-                    color: glowColor.withValues(alpha: 0.30),
-                    blurRadius: 18,
-                    offset: const Offset(0, 4),
+                    color: glowColor.withValues(alpha: isDark ? 0.25 : 0.16),
+                    blurRadius: 14,
+                    offset: const Offset(0, 3),
                   ),
                 ]
               : [],
@@ -125,7 +140,7 @@ class _GlassButtonState extends State<GlassButton> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(widget.borderRadius),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Material(
               color: Colors.transparent,
               child: InkWell(
@@ -142,22 +157,22 @@ class _GlassButtonState extends State<GlassButton> {
                       colors: isEnabled
                           ? gradientColors
                           : [
-                              Colors.white.withValues(alpha: 0.08),
-                              Colors.white.withValues(alpha: 0.04),
+                              Colors.grey.withValues(alpha: 0.2),
+                              Colors.grey.withValues(alpha: 0.1),
                             ],
                     ),
                     border: Border.all(
-                      color: isEnabled ? borderColor : Colors.white.withValues(alpha: 0.08),
+                      color: isEnabled ? borderColor : Colors.transparent,
                       width: 1.1,
                     ),
                   ),
                   child: Center(
                     child: widget.isLoading
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
                             child: CircularProgressIndicator(
-                              color: Colors.white,
+                              color: contentColor,
                               strokeWidth: 2.2,
                             ),
                           )
@@ -168,18 +183,18 @@ class _GlassButtonState extends State<GlassButton> {
                               if (widget.icon != null) ...[
                                 Icon(
                                   widget.icon,
-                                  size: 19,
-                                  color: isEnabled ? contentColor : Colors.white38,
+                                  size: 18,
+                                  color: isEnabled ? contentColor : Colors.grey,
                                 ),
                                 const SizedBox(width: 8),
                               ],
                               Text(
                                 widget.text,
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.5,
-                                  color: isEnabled ? contentColor : Colors.white38,
+                                  color: isEnabled ? contentColor : Colors.grey,
                                 ),
                               ),
                             ],

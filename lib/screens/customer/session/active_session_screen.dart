@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/charger_model.dart';
+import '../../../services/theme_service.dart';
 import '../../../widgets/glass/glass_background.dart';
 import '../../../widgets/glass/glass_button.dart';
 import '../../../widgets/glass/glass_container.dart';
@@ -78,27 +80,38 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
   }
 
   void _stopCharging() {
+    final isDark = ThemeService.isDark(context);
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0B132B),
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+          side: BorderSide(color: isDark ? AppColors.deepTeal.withValues(alpha: 0.3) : AppColors.neutral.withValues(alpha: 0.15)),
         ),
-        title: const Text("Stop Charging?", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          "Stop Charging?",
+          style: TextStyle(
+            color: isDark ? AppColors.darkText : AppColors.neutralDark,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Text(
           "Your charging session will be finalized and a digital settlement receipt will be generated.",
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
+          style: TextStyle(
+            color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
+            fontSize: 13,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Continue Charging", style: TextStyle(color: Colors.white60)),
+            child: Text("Continue Charging", style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent.shade400,
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
@@ -114,17 +127,16 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
   }
 
   void _showReceipt() {
+    final isDark = ThemeService.isDark(context);
+
     showModalBottomSheet(
       context: context,
       isDismissible: false,
       backgroundColor: Colors.transparent,
       builder: (ctx) => GlassContainer(
+        tier: GlassTier.primary,
         padding: const EdgeInsets.all(28),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        blur: 28,
-        opacity: 0.45,
-        color: const Color(0xFF0B132B),
-        borderColor: Colors.white.withValues(alpha: 0.2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -132,43 +144,60 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                color: isDark ? AppColors.deepTeal.withValues(alpha: 0.35) : AppColors.accentLime.withValues(alpha: 0.40),
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF00E676), width: 1.5),
+                border: Border.all(color: isDark ? AppColors.accentLime : AppColors.deepTeal, width: 1.5),
               ),
-              child: const Icon(Icons.check_rounded, color: Color(0xFF00E676), size: 40),
+              child: Icon(Icons.check_rounded, color: isDark ? AppColors.accentLime : AppColors.deepTeal, size: 40),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               "Charging Session Complete",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.darkText : AppColors.neutralDark,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               _activeCharger.name,
-              style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.7)),
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
+              ),
             ),
             const SizedBox(height: 20),
             GlassContainer(
+              tier: GlassTier.tertiary,
               padding: const EdgeInsets.all(16),
               borderRadius: BorderRadius.circular(20),
-              blur: 16,
-              opacity: 0.1,
               child: Column(
                 children: [
-                  _receiptRow("Duration", _formatTime(_elapsedSeconds)),
+                  _receiptRow("Duration", _formatTime(_elapsedSeconds), isDark),
                   const SizedBox(height: 8),
-                  _receiptRow("Energy Delivered", "${_energyDeliveredKwh.toStringAsFixed(2)} kWh"),
+                  _receiptRow("Energy Delivered", "${_energyDeliveredKwh.toStringAsFixed(2)} kWh", isDark),
                   const SizedBox(height: 8),
-                  _receiptRow("Average Power", "${_activeCharger.powerKw.toInt()} kW"),
-                  Divider(height: 24, color: Colors.white.withValues(alpha: 0.15)),
+                  _receiptRow("Average Power", "${_activeCharger.powerKw.toInt()} kW", isDark),
+                  Divider(height: 24, color: isDark ? AppColors.neutral.withValues(alpha: 0.2) : AppColors.neutral.withValues(alpha: 0.12)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Total Settled", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+                      Text(
+                        "Total Settled",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
+                        ),
+                      ),
                       Text(
                         "₹${_currentCost.toStringAsFixed(0)}",
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF00E676)),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? AppColors.accentLime : AppColors.deepTeal,
+                        ),
                       ),
                     ],
                   ),
@@ -189,12 +218,12 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
     );
   }
 
-  Widget _receiptRow(String label, String val) {
+  Widget _receiptRow(String label, String val, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.65))),
-        Text(val, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+        Text(label, style: TextStyle(fontSize: 13, color: isDark ? AppColors.darkTextSecondary : AppColors.neutral)),
+        Text(val, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? AppColors.darkText : AppColors.neutralDark)),
       ],
     );
   }
@@ -202,6 +231,7 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
   @override
   Widget build(BuildContext context) {
     final progress = (_currentBattery / 100.0).clamp(0.0, 1.0);
+    final isDark = ThemeService.isDark(context);
 
     return Scaffold(
       body: GlassBackground(
@@ -215,24 +245,27 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
                 Row(
                   children: [
                     GlassContainer(
+                      tier: GlassTier.tertiary,
                       width: 44,
                       height: 44,
                       borderRadius: BorderRadius.circular(14),
-                      blur: 16,
-                      opacity: 0.1,
                       child: IconButton(
                         padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
+                          size: 18,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Text(
+                    Text(
                       "Live Charging Telemetry",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isDark ? AppColors.darkText : AppColors.neutralDark,
                       ),
                     ),
                   ],
@@ -242,23 +275,26 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
 
                 // Station Pill Banner
                 GlassContainer(
+                  tier: GlassTier.tertiary,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   borderRadius: BorderRadius.circular(20),
-                  blur: 16,
-                  opacity: 0.12,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.ev_station_rounded, color: Color(0xFF00E676), size: 18),
+                      Icon(Icons.ev_station_rounded, color: isDark ? AppColors.accentLime : AppColors.deepTeal, size: 18),
                       const SizedBox(width: 8),
                       Text(
                         _activeCharger.name,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(
+                          color: isDark ? AppColors.darkText : AppColors.neutralDark,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         "(${_activeCharger.powerLabel})",
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
+                        style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.neutral, fontSize: 12),
                       ),
                     ],
                   ),
@@ -283,7 +319,8 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
                               height: 190 + (_pulseController.value * 20),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: const Color(0xFF00E676).withValues(alpha: 0.12 * _pulseController.value),
+                                color: (isDark ? AppColors.accentLime : AppColors.deepTeal)
+                                    .withValues(alpha: 0.10 * _pulseController.value),
                               ),
                             );
                           },
@@ -296,8 +333,12 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
                           child: CircularProgressIndicator(
                             value: progress,
                             strokeWidth: 12,
-                            backgroundColor: Colors.white.withValues(alpha: 0.1),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00E676)),
+                            backgroundColor: isDark
+                                ? AppColors.neutral.withValues(alpha: 0.20)
+                                : AppColors.neutral.withValues(alpha: 0.12),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              isDark ? AppColors.accentLime : AppColors.deepTeal,
+                            ),
                             strokeCap: StrokeCap.round,
                           ),
                         ),
@@ -306,21 +347,21 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.bolt_rounded, size: 36, color: Color(0xFF00E676)),
+                            Icon(Icons.bolt_rounded, size: 36, color: isDark ? AppColors.accentLime : AppColors.deepTeal),
                             const SizedBox(height: 2),
                             Text(
                               "${_currentBattery.toInt()}%",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 42,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: isDark ? AppColors.darkText : AppColors.neutralDark,
                               ),
                             ),
                             Text(
                               "Target ${_targetBattery.toInt()}%",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.white.withValues(alpha: 0.65),
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.neutral,
                               ),
                             ),
                           ],
@@ -334,25 +375,26 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
 
                 // Live Metrics 2x2 Grid
                 GlassContainer(
+                  tier: GlassTier.secondary,
                   padding: const EdgeInsets.all(20),
                   borderRadius: BorderRadius.circular(24),
-                  blur: 20,
-                  opacity: 0.12,
                   child: Column(
                     children: [
                       Row(
                         children: [
                           _buildLiveTile(
                             icon: Icons.electric_bolt_rounded,
-                            color: const Color(0xFFFFB300),
+                            color: const Color(0xFFF59E0B),
                             label: "Energy Delivered",
                             value: "${_energyDeliveredKwh.toStringAsFixed(2)} kWh",
+                            isDark: isDark,
                           ),
                           _buildLiveTile(
                             icon: Icons.speed_rounded,
-                            color: const Color(0xFF00E5FF),
+                            color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                             label: "Charging Speed",
                             value: "${_activeCharger.powerKw.toInt()} kW",
+                            isDark: isDark,
                           ),
                         ],
                       ),
@@ -361,15 +403,17 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
                         children: [
                           _buildLiveTile(
                             icon: Icons.timer_rounded,
-                            color: const Color(0xFF00E676),
+                            color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                             label: "Session Time",
                             value: _formatTime(_elapsedSeconds),
+                            isDark: isDark,
                           ),
                           _buildLiveTile(
                             icon: Icons.currency_rupee_rounded,
-                            color: const Color(0xFFF43F5E),
+                            color: isDark ? AppColors.accentLime : AppColors.deepTeal,
                             label: "Running Total",
                             value: "₹${_currentCost.toStringAsFixed(0)}",
+                            isDark: isDark,
                           ),
                         ],
                       ),
@@ -382,7 +426,7 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
                 // Stop Charging CTA Button
                 GlassButton(
                   text: "STOP CHARGING & SETTLE",
-                  color: Colors.redAccent.shade400,
+                  variant: GlassButtonVariant.destructive,
                   icon: Icons.power_settings_new_rounded,
                   onPressed: _stopCharging,
                 ),
@@ -401,6 +445,7 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
     required Color color,
     required String label,
     required String value,
+    required bool isDark,
   }) {
     return Expanded(
       child: Column(
@@ -412,17 +457,17 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen>
               const SizedBox(width: 6),
               Text(
                 label,
-                style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.65)),
+                style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkTextSecondary : AppColors.neutral),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: isDark ? AppColors.darkText : AppColors.neutralDark,
             ),
           ),
         ],
