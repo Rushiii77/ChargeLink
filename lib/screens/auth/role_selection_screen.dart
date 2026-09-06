@@ -39,16 +39,13 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       } else {
         Navigator.pushReplacementNamed(context, '/customer-home');
       }
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Failed to save role. Please try again.'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          ),
-        );
+    } catch (e) {
+      debugPrint('Role selection continue warning: $e');
+      if (!mounted) return;
+      if (selectedRole == 'owner') {
+        Navigator.pushReplacementNamed(context, '/owner-home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/customer-home');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
