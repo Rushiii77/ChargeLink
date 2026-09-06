@@ -31,7 +31,6 @@ class _CustomerHomeState extends State<CustomerHome> {
 
   // ── Map ───────────────────────────────────────────────────────────────────
   GoogleMapController? _mapController;
-  BitmapDescriptor? _customMarker;
 
   static const CameraPosition _initialPosition = CameraPosition(
     target: LatLng(19.0330, 73.0297), // Nerul, Navi Mumbai
@@ -52,7 +51,7 @@ class _CustomerHomeState extends State<CustomerHome> {
   void initState() {
     super.initState();
     ThemeService.themeModeNotifier.addListener(_updateMapTheme);
-    _loadCustomMarker();
+    _loadCustomMarkers();
     _initChargers();
   }
 
@@ -68,20 +67,28 @@ class _CustomerHomeState extends State<CustomerHome> {
     if (mounted) setState(() {});
   }
 
-  // ── Custom Marker ─────────────────────────────────────────────────────────
-  Future<void> _loadCustomMarker() async {
+  // ── Custom Markers ────────────────────────────────────────────────────────
+  BitmapDescriptor? _availableMarker;
+  BitmapDescriptor? _busyMarker;
+
+  Future<void> _loadCustomMarkers() async {
     try {
-      final marker = await BitmapDescriptor.asset(
-        const ImageConfiguration(size: Size(44, 44)),
+      final availableMarker = await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(46, 46)),
         'assets/icons/ev_marker.png',
+      );
+      final busyMarker = await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(46, 46)),
+        'assets/icons/ev_marker_busy.png',
       );
       if (mounted) {
         setState(() {
-          _customMarker = marker;
+          _availableMarker = availableMarker;
+          _busyMarker = busyMarker;
         });
       }
     } catch (_) {
-      // Fall back to default marker
+      // Fall back to default markers
     }
   }
 
@@ -146,10 +153,11 @@ class _CustomerHomeState extends State<CustomerHome> {
       return Marker(
         markerId: MarkerId(charger.id),
         position: LatLng(charger.latitude, charger.longitude),
-        icon: _customMarker ??
-            (charger.isAvailable
-                ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
-                : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)),
+        icon: charger.isAvailable
+            ? (_availableMarker ??
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen))
+            : (_busyMarker ??
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)),
         infoWindow: InfoWindow(
           title: charger.name,
           snippet:

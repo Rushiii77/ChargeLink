@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../services/auth_service.dart';
 import '../../services/theme_service.dart';
 import '../../widgets/glass/glass_background.dart';
 import '../../widgets/glass/glass_container.dart';
@@ -16,6 +17,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  final AuthService _authService = AuthService();
   Timer? _timer;
 
   @override
@@ -34,10 +36,33 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    _timer = Timer(const Duration(seconds: 3), () {
+    _navigateNext();
+  }
+
+  Future<void> _navigateNext() async {
+    await Future.delayed(const Duration(milliseconds: 2400));
+    if (!mounted) return;
+
+    try {
+      final user = _authService.currentUser;
+      if (user != null) {
+        final role = await _authService.getUserRole(user.uid);
+        if (!mounted) return;
+
+        if (role == 'owner') {
+          Navigator.pushReplacementNamed(context, '/owner-home');
+        } else if (role == 'customer') {
+          Navigator.pushReplacementNamed(context, '/customer-home');
+        } else {
+          Navigator.pushReplacementNamed(context, '/role-selection');
+        }
+      } else {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (_) {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/login');
-    });
+    }
   }
 
   @override

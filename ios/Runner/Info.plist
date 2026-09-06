@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ChargeLink requires location access to find nearby EV charging stations on the map.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>ChargeLink requires location access to navigate to EV charging stations.</string>
 </dict>
 </plist>
